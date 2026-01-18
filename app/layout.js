@@ -27,3 +27,5 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
+// here i want to see if git is working fine 

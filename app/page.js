@@ -18,4 +18,3 @@ it's a new year , so what a good time to start new life , new me  </p>
 </main>
   );
 }
-rafce
