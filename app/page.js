@@ -1,20 +1,21 @@
-
+import { auth } from "@/auth";
+import { useSession, signIn, signOut } from "next-auth/react"
+import Link from "next/link";
 import Image from "next/image";
 
-export default function Home() {
-  return (
-<main>
-<p> to do list here is going to be my project , graduation project 
-im kinda nervous and avoident but it's fine im learning to let go of this habbit 
-it's a new year , so what a good time to start new life , new me  </p>
-< button className="bg-amber-800"> 
-  click here 
-</button>
-
-          
-<h1 className="text-4xl font-bold text-blue-600 bg-yellow-200">
-  Tailwind is working!
-</h1>
-</main>
-  );
+export default async function Home() {
+  const session = await auth();
+  if (session) {
+    return (<>
+      <div> welcome {session.user.name}</div>
+      <Link href={"/api/auth/signout"}>sign out</Link>
+    </>
+    )
+  }
+  else {
+    return (
+      <><div>log in here </div>
+        <Link href="/api/auth/signin">sign in </Link></>
+    )
+  }
 }
