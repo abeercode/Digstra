@@ -9,6 +9,7 @@ export default async function Home() {
     return (<>
       <div> welcome {session.user.name}</div>
       <Link href={"/api/auth/signout"}>sign out</Link>
+      
     </>
     )
   }
