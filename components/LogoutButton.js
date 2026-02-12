@@ -1,5 +1,6 @@
 "use client"
 import { signOut } from "next-auth/react"
+import { redirect } from "next/dist/server/api-utils"
  
 export default function LogoutButton() {
     //"If you want the user to be redirected somewhere else after sign in (.i.e /dashboard), 
