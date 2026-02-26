@@ -8,6 +8,7 @@ export default async function Dashboard() {
   return <p>Redirecting...</p>; // Or just return null
 }
     return <>
+    <div className="h-10 w-full"></div>
         <h1>hi welcome back,{session?.user?.name}  </h1>
         <h1>you have {session?.user?.points} number of points </h1>
         <LogoutButton/ >

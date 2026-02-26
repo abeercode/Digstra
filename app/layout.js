@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { auth } from "@/auth";
-import SessionProvider  from "@/components/SessionProvider";
-
+import SessionProvider from "@/components/SessionProvider";
+import NavBar from "@/components/NavBar";
 
 
 const geistSans = Geist({
@@ -27,6 +27,9 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProvider session={session}>
+
+          {/* here where i should put static elements like navbar */}
+          <NavBar session={session} />
           <main>
             {children}
           </main>

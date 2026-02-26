@@ -13,11 +13,21 @@ export default async function Home() {
   if (session) {
 
     redirect('/Dashboard')
-}
+  }
   else {
     return (
-      <><div>log in here </div>
+
+      <main className=" p-0 m-0 bg-[url(/anotherInitialBG.png)] min-h-screen box-border flex flex-col items-center justify-center relative" style={{
+        imageRendering: 'pixelated',
+        height: "610px",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',   
+        backgroundRepeat: 'no-repeat',
+      }}>
+         <div className="text-6xl"> Digstra</div>
         <LoginButton> </LoginButton>
-      </>)
+      </main>
+    )
   }
+
 }
