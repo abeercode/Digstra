@@ -11,7 +11,7 @@ export default async function Dashboard() {
     <div className="h-10 w-full"></div>
         <h1>hi welcome back,{session?.user?.name}  </h1>
         <h1>you have {session?.user?.points} number of points </h1>
-        <LogoutButton/ >
+        <LogoutButton/>
 
     </>
 
