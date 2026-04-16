@@ -24,7 +24,6 @@ export default async function RoomId({ params }) {
         notFound();
 
 }
-
     return (
         <>
            <div>
