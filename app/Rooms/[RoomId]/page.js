@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import RoomTimer from "@/components/RoomTimer";
+import ShareRoom from "@/components/ShareRoom";
 
 export default async function RoomPage({ params }) {
 
@@ -51,8 +52,9 @@ export default async function RoomPage({ params }) {
                         created on: {new Date(room.created_at).toLocaleDateString()}
                     </p>
                 </div>Room ID: {RoomId}</div>
-            <RoomTimer duration={room.duration_minutes}></RoomTimer>
-            <button name="ShareLink" onClick={SharingLink()}>Share the room!</button>
+            <RoomTimer duration={room.duration_minutes} roomId={RoomId}></RoomTimer>
+            <ShareRoom/>
+
             {/* {handlingTimer(room)} */}
             {/* //end of debugging use */}
         </>

@@ -1,18 +1,18 @@
 
 "use client"
 import { useState, useRef, useEffect } from "react";
-export default function RoomTimer({ duration }) {
+
+import { updateRoomStatus } from "@/app/lib/actions";
+export default function RoomTimer({ duration , roomId }) {
 
     const [timeLeft, setTimeLeft] = useState(duration * 60);
     const [isActive, setIsActive] = useState(false);
-
-
-
     const timerRef = useRef(null);
+
+
     const handleStart = () => {
         setIsActive(true);
     }
-
 
     //this section-function handle the time countdown and ensure that i won't countdown if the time left is 0
     useEffect(() => {
@@ -26,6 +26,22 @@ export default function RoomTimer({ duration }) {
         }
         return () => clearInterval(timerRef.current);
     }, [isActive, timeLeft]);
+
+useEffect(() => {
+        if (timeLeft === 0 && isActive) {
+            setIsActive(false);
+            // eslint-disable-next-line react-hooks/immutability
+            handleFinishSession();
+        }
+    }, [timeLeft, isActive]);
+
+    const handleFinishSession = async () => {
+        // Now roomId is defined because we added it to props!
+        await updateRoomStatus(roomId); 
+        alert("Session Finished! You've earned your break.");
+    };
+
+    
     //  return <h1>{duration}</h1>
 
     const formatTime =(time) =>{
