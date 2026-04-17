@@ -2,13 +2,15 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 
-export default async function RoomId({ params }) {
+export default async function RoomPage({ params }) {
 
     const {RoomId} = await params;
     const supabase = await createClient();
+
    const resolvedParams = await params;
 
-   
+
+   //fetch room data from the server , joined with profiles table
     const { data: room, error } = await supabase
         .from('rooms')
 .select(`
@@ -21,9 +23,10 @@ export default async function RoomId({ params }) {
         .eq('id', RoomId)
         .single();
     if (error || !room) {
-        notFound();
+return <div className="p-10 bg-red-100">Database Error: {error.message}</div>;
 
 }
+
     return (
         <>
            <div>

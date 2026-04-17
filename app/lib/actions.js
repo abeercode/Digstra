@@ -1,37 +1,49 @@
 'use server'
 
-
+import { auth } from "@/auth";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-// no need for default export for actions, only components 
+
 export async function createRoom(formData) {
+    // 1. Get the session first
+    const session = await auth();
+    
+    // 2. Guard Clause: Stop if not logged in
+    if (!session?.user) {
+        throw new Error("Please log in first!");
+    }
 
+    const user = session.user;
+    
+    // Debugging (Keep these until you confirm the redirect works!)
+    console.log("Creating room for:", user.email);
+
+    // 3. Prepare the data
     const supabase = await createClient();
-    roomName = formData.get();
-    // get the user data
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) throw new Error("please log in first!");
     const nameInput = formData.get('roomName') || "New Study Session";
 
-    // and then insert the name into the database 
+    // 4. Database Insert
     const { data: newRoom, error } = await supabase
         .from('rooms')
         .insert([
             {
-                name: formData.get('roomName') || "New Study Session",
-                host_id: user.id
+                name: nameInput,
+                host_id: user.id 
             }
         ])
         .select()
         .single();
 
+    // 5. Handle Database Errors
     if (error) {
         console.error("Database Insert Error:", error.message);
-        throw new Error(error.message);
+        throw new Error("Could not create room. Please try again.");
     }
-    // lastly redirect the user to the new room 
-    redirect(`/Rooms/${newRoom.id}`);
+console.log("Room created! ID is:", newRoom.id); // Check your VS Code terminal for this!
 
+if (!newRoom?.id) {
+    throw new Error("Room was created but I couldn't get the ID back!");
+}
 
+redirect(`/Rooms/${newRoom.id}`); // Ensure 'id' is lowercase to match Supabase
 }
