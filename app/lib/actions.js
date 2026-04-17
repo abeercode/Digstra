@@ -21,6 +21,7 @@ export async function createRoom(formData) {
     // 3. Prepare the data
     const supabase = await createClient();
     const nameInput = formData.get('roomName') || "New Study Session";
+    const durationInput = formData.get("duration");
 
     // 4. Database Insert
     const { data: newRoom, error } = await supabase
@@ -28,7 +29,8 @@ export async function createRoom(formData) {
         .insert([
             {
                 name: nameInput,
-                host_id: user.id 
+                host_id: user.id ,
+                duration_minutes: parseInt(durationInput)
             }
         ])
         .select()
