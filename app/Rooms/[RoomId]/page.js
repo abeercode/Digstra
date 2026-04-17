@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound , redirect} from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import RoomTimer from "@/components/RoomTimer";
@@ -20,12 +20,18 @@ export default async function RoomPage({ params }) {
         name,
         created_at,
         duration_minutes,
+        expires_at,
+        is_finished,
         profiles!left (
             full_name
         )
     `)
+    
         .eq('id', RoomId)
         .single();
+        if (room?.is_finished) {
+    redirect(`/Rooms/${RoomId}/summary`);
+}
     //end of debugging use
     if (error || !room) {
         return <div className="p-10 bg-red-100">Database Error: {error.message}</div>;

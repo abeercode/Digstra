@@ -48,19 +48,39 @@ export async function createRoom(formData) {
 
 //another action that handle when the session is ended and update the needed columns
 export async function updateRoomStatus(roomId) {
+    try {
+        const supabase = await createClient();
+        
+        // LOG 1: Check if the function starts
+        console.log("Checking Room ID:", roomId);
 
+        const { data, error } = await supabase
+            .from('rooms')
+            .update({ 
+                is_finished: true,
+                expires_at: new Date().toISOString() 
+            })
+            .eq('id', roomId) // Ensure roomId is exactly what's in the DB
+            .select();
 
-    const supabase = await createClient();
-    const { error } = await supabase
-        .from('rooms')
-        .update({ is_finished: true }) // Make sure you added this column to Supabase!
-        .eq('id', roomId);
+        // LOG 2: Check for errors
+        if (error) {
+            console.error("SUPABASE UPDATE ERROR:", error.message);
+            return { success: false, error: error.message };
+        }
 
-    if (error) {
-        console.error("Error updating room status:", error.message);
+        // LOG 3: Check if any row was actually found
+        if (!data || data.length === 0) {
+            console.error("UPDATE FAILED: No room found with that ID.");
+            return { success: false };
+        }
+
+        console.log("SUCCESS: Room marked as finished!");
+        return { success: true };
+
+    } catch (err) {
+        console.error("CRITICAL SERVER ERROR:", err);
         return { success: false };
     }
-
-    return { success: true };
 }
 

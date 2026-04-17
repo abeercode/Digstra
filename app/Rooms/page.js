@@ -3,7 +3,7 @@ import { createRoom } from "@/app/lib/actions";
 export default function Rooms() {
 
     const options = []
-    for (let i = 5; i <= 120; i += 5) {
+    for (let i = 1; i <= 120; i += 1) {
         options.push(<option value={i} key={i}>{i}</option>);
 
     }

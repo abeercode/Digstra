@@ -1,55 +1,58 @@
-
 "use client"
 import { useState, useRef, useEffect } from "react";
-
 import { updateRoomStatus } from "@/app/lib/actions";
-export default function RoomTimer({ duration , roomId }) {
+import { useRouter } from "next/navigation";
 
+export default function RoomTimer({ duration, roomId }) {
     const [timeLeft, setTimeLeft] = useState(duration * 60);
     const [isActive, setIsActive] = useState(false);
     const timerRef = useRef(null);
+    const router = useRouter();
 
-
-    const handleStart = () => {
-        setIsActive(true);
-    }
-
-    //this section-function handle the time countdown and ensure that i won't countdown if the time left is 0
     useEffect(() => {
         if (isActive && timeLeft > 0) {
             timerRef.current = setInterval(() => {
-                setTimeLeft((prevTime) => prevTime - 1);
+                setTimeLeft((prevTime) => prevTime - 1); // FIXED: subtract 1 second, not 60
             }, 1000);
         } else {
-            // Stop the ticking if paused or time hits zero
             clearInterval(timerRef.current);
         }
         return () => clearInterval(timerRef.current);
     }, [isActive, timeLeft]);
 
-useEffect(() => {
-        if (timeLeft === 0 && isActive) {
+    const handleFinishSession = async () => {
+        console.log("Calling updateRoomStatus for ID:", roomId);
+        try {
+            const result = await updateRoomStatus(roomId); 
+            console.log("Database Response:", result);
+            
+            if (result.success) {
+                router.push(`/Rooms/${roomId}/summary`); 
+            } else {
+                alert("Database update failed. Check console.");
+            }
+        } catch (e) {
+            console.error("Critical Error during finish:", e);
+        }
+    };
+
+    useEffect(() => {
+        // Change this to <= 0 to be safe
+        if (timeLeft <= 0 ) {
+            console.log("TIMER REACHED ZERO - Triggering update...");
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsActive(false);
-            // eslint-disable-next-line react-hooks/immutability
             handleFinishSession();
         }
     }, [timeLeft, isActive]);
 
-    const handleFinishSession = async () => {
-        // Now roomId is defined because we added it to props!
-        await updateRoomStatus(roomId); 
-        alert("Session Finished! You've earned your break.");
+
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(Math.max(0, time) / 60);
+        const seconds = Math.max(0, time) % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
-
-    
-    //  return <h1>{duration}</h1>
-
-    const formatTime =(time) =>{
-        const minutes= Math.floor(time/60);
-        const seconds = time%60;
-        return  `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    };
-
 
     return (
 
