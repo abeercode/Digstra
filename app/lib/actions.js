@@ -84,3 +84,14 @@ export async function updateRoomStatus(roomId) {
     }
 }
 
+// action that update the started_at column once it's called 
+export async function startRoomTimer(roomId) {
+    const supabase = await createClient(); // Use your server client
+    const { error } = await supabase
+        .from('rooms')
+        .update({ started_at: new Date().toISOString() })
+        .eq('id', roomId);
+
+    if (error) throw new Error(error.message);
+    return { success: true };
+}

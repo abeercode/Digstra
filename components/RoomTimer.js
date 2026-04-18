@@ -1,78 +1,114 @@
 "use client"
-import { useState, useRef, useEffect } from "react";
-import { updateRoomStatus } from "@/app/lib/actions";
+import { useState, useEffect, useMemo } from "react";
+import { updateRoomStatus, startRoomTimer } from "@/app/lib/actions";
 import { useRouter } from "next/navigation";
+import { client } from "@/lib/supabase/client";
 
-export default function RoomTimer({ duration, roomId, currentUserId, hostId }) {
+export default function RoomTimer({ duration, roomId, currentUserId, hostId, initialStartedAt }) {
+
     // const [timeLeft, setTimeLeft] = useState(duration * 60);
-    const [isActive, setIsActive] = useState(false);
-    const timerRef = useRef(null);
+    const [startedAt, setStartedAt] = useState(initialStartedAt);
+    const [timeLeft, setTimeLeft] = useState(duration * 60);
     const router = useRouter();
+    const supabase = useMemo(() => client(), []);
 
     // to check if the user is the host 
-   const isHost = hostId === currentUserId;
-
+    const isHost = hostId === currentUserId;
     // i don't even know what hasmounted do but at least it solve the issue lol
     const [hasMounted, setHasMounted] = useState(false);
     useEffect(() => {
         setHasMounted(true);
     }, []);
 
-    //this to save the timer in local storage instead then resetting every time the website is refreshed
-    const storageKey = `timer_${roomId}`;
 
-    const [timeLeft, setTimeLeft] = useState(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem(storageKey);
-            return saved !== null ? parseInt(saved) : duration * 60;
-        }
-        return duration * 60;
-    });
-    // this useEffect saves the time to the browser every time the clock changes
+    // more like listner which listen for the moment the host clicks "Start"
     useEffect(() => {
-        if (typeof window !== "undefined") {
-            localStorage.setItem(storageKey, timeLeft.toString());
-        }
-    }, [timeLeft, storageKey]);
+        const channel = supabase
+            .channel(`room_timer_${roomId}`)
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
+                (payload) => {
+                    if (payload.new.started_at) {
+                        setStartedAt(payload.new.started_at);
+                    }
+                }
+            )
+            .subscribe();
 
-    //the segment that makes the code actually move 
+        return () => { supabase.removeChannel(channel); };
+    }, [roomId, supabase]);
+
+    // the ticker, recalculates remaining time every second
+
+    //The Math: Remaining Time = Total Duration - (Now - StartTime)
     useEffect(() => {
-        let interval;
+        if (!startedAt) return;
 
-        if (isActive && timeLeft > 0) {
-            interval = setInterval(() => {
-                setTimeLeft((prevTime) => {
-                    if (prevTime <= 1) {
+        const interval = setInterval(() => {
+            const startTime = new Date(startedAt).getTime();
+            const now = new Date().getTime();
+            const elapsedSeconds = Math.floor((now - startTime) / 1000);
+            const remaining = (duration * 60) - elapsedSeconds;
 
-                        clearInterval(interval)
-                        setIsActive(false)
-                        localStorage.removeItem(storageKey);
+            if (remaining <= 0) {
+                setTimeLeft(0);
+                clearInterval(interval);
 
-                        handleFinishSession();
-                        return 0;
-                    } return prevTime - 1;
-                });
-            }, 1000)
+                // and then redirect users to summary page
+                console.log("Timer finished! Redirecting...");
+                router.push(`/Rooms/${roomId}/summary`);
 
-        } else {
-            clearInterval(interval);
-        }
+                // Only the host needs to tell the database to mark it as finished
+                if (isHost) {
+                    handleFinishSession();
+                }
+            } else {
+                setTimeLeft(remaining);
+            }
+        }, 1000);
         return () => clearInterval(interval);
-    }, [isActive, timeLeft, storageKey]);
+    }, [startedAt, duration, isHost, roomId, router]);
+
+
+    const handleStart = async () => {
+        try {
+
+            // This makes the timer start moving the millisecond it clicked
+            const now = new Date().toISOString();
+            setHasMounted(true);
+            setStartedAt(now);
+            
+            //call startRoomTimer to update the table
+            await startRoomTimer(roomId);
+        } catch (e) {
+            console.error("Failed to start timer:", e);
+            setStartedAt(null);
+        }};
+
 
     const handleFinishSession = async () => {
-
         try {
             const result = await updateRoomStatus(roomId);
-
             if (result.success) {
-                localStorage.removeItem(storageKey);
                 router.push(`/Rooms/${roomId}/summary`);
             }
         } catch (e) {
             console.error("Critical Error during finish:", e);
         }
     };
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(Math.max(0, time) / 60);
+        const seconds = Math.max(0, time) % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
+    // from what i understand, it render the initial duration from the server, and then the system will render the actual remaining duration 
+    if (!hasMounted) {
+        return <h1 className="text-7xl font-bold text-blue-600">{formatTime(duration * 60)}</h1>;
+    }
+
     // eslint-disable-next-line react-hooks/rules-of-hooks
     // useEffect(() => {
     //     // Change this to <= 0 to be safe
@@ -84,20 +120,6 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId }) {
     //     }
     // }, [timeLeft, isActive]);
 
-    const formatTime = (time) => {
-        const minutes = Math.floor(Math.max(0, time) / 60);
-        const seconds = Math.max(0, time) % 60;
-        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    };
-
-    // this runs at the first when the browser is refreshed before fetching the data from localStorage
-    if (!hasMounted) {
-        return (
-            <h1 className="text-7xl font-bold text-blue-600">
-                {formatTime(duration * 60)}
-            </h1>
-        )
-    }
     return (
         <>
             <h1 className="text-7xl  font-bold text-blue-600">
@@ -105,12 +127,19 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId }) {
             </h1>
             {/* Control Buttons */}
             <div className="flex gap-4">
-                {isHost && (<button
-                    onClick={() => setIsActive(!isActive)}
-                    className={`px-6 py-2 rounded-full font-bold text-white ${isActive ? 'bg-red-500' : 'bg-green-500'}`}
-                >
-                    {isActive ? "Pause" : "Start"}
-                </button>)}
+                {isHost && !startedAt && (
+                    <button
+                        onClick={handleStart}
+                        className="px-8 py-3 bg-green-500 hover:bg-green-600 rounded-full font-bold text-white transition-all shadow-lg"
+                    >
+                        Start Session
+                    </button>
+                )}
+                {startedAt && (
+                    <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold animate-pulse">
+                        ● Session Live
+                    </span>
+                )}
             </div>
         </>)
 }
