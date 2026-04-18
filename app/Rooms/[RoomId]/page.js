@@ -3,11 +3,17 @@ import { createClient } from "@/lib/supabase/server";
 
 import RoomTimer from "@/components/RoomTimer";
 import ShareRoom from "@/components/ShareRoom";
+import { auth } from "@/auth";
+
+import ActiveUsers from "@/components/ActiveUsers";
 
 export default async function RoomPage({ params }) {
 
     const { RoomId } = await params;
     const supabase = await createClient();
+    const session =await auth();
+    const currentUserId = session?.user?.id; 
+    
 
     const resolvedParams = await params;
     const p = params;
@@ -19,6 +25,7 @@ export default async function RoomPage({ params }) {
         .select(`
         name,
         created_at,
+        host_id,
         duration_minutes,
         expires_at,
         is_finished,
@@ -42,11 +49,10 @@ export default async function RoomPage({ params }) {
     
 // navigator.clipboard.writeText(window.location.href)
 
-
 //     }
 
     return (
-        //debugging use
+       
         <>
             <div>
                 <h1>Welcome to {room.name}</h1>
@@ -58,9 +64,13 @@ export default async function RoomPage({ params }) {
                         created on: {new Date(room.created_at).toLocaleDateString()}
                     </p>
                 </div>Room ID: {RoomId}</div>
-            <RoomTimer duration={room.duration_minutes} roomId={RoomId}></RoomTimer>
+            <RoomTimer duration={room.duration_minutes} roomId={RoomId} currentUserId={currentUserId} hostId={room.host_id}></RoomTimer>
             <ShareRoom/>
-
+<ActiveUsers 
+    roomId={RoomId} 
+    userName={room.profiles?.full_name || session?.user?.name} 
+    currentUserId={currentUserId} // Pass this!
+/>
             {/* {handlingTimer(room)} */}
             {/* //end of debugging use */}
         </>
