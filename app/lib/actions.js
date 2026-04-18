@@ -95,3 +95,23 @@ export async function startRoomTimer(roomId) {
     if (error) throw new Error(error.message);
     return { success: true };
 }
+
+
+export async function sendRoomMessage(roomId, userId, content) {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from('room_messages')
+        .insert([{ room_id: roomId, user_id: userId, content: content }])
+        .select();
+
+    if (error) {
+        // This logs on your Fedora terminal (server-side)
+        console.error("Supabase Error:", error.message);
+        
+        // This sends the error back to the browser
+        return { success: false, error: error.message }; 
+    }
+
+    return { success: true, data };
+}

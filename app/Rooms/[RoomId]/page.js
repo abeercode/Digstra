@@ -4,6 +4,10 @@ import RoomTimer from "@/components/RoomTimer";
 import ShareRoom from "@/components/ShareRoom";
 import { auth } from "@/auth";
 
+import RoomChat from "@/components/RoomChat";
+
+
+
 // import ActiveUsers from "@/components/ActiveUsers";
 export default async function RoomPage({ params }) {
 
@@ -61,6 +65,7 @@ export default async function RoomPage({ params }) {
                 initialStartedAt={room.started_at}
             />
             <ShareRoom />
+            <RoomChat roomId={RoomId} currentUserId={currentUserId} initialMessages={[]}/>
             {/* <ActiveUsers 
     roomId={RoomId} 
     userName={userName} 
