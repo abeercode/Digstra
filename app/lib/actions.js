@@ -3,6 +3,10 @@
 import { auth } from "@/auth";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+    const pdf = require("pdf-parse-fork");
+// import pdf from "pdf-parse"
+
+
 
 export async function createRoom(formData) {
     const session = await auth();
@@ -50,15 +54,15 @@ export async function createRoom(formData) {
 export async function updateRoomStatus(roomId) {
     try {
         const supabase = await createClient();
-        
+
         // LOG 1: Check if the function starts
         console.log("Checking Room ID:", roomId);
 
         const { data, error } = await supabase
             .from('rooms')
-            .update({ 
+            .update({
                 is_finished: true,
-                expires_at: new Date().toISOString() 
+                expires_at: new Date().toISOString()
             })
             .eq('id', roomId) // Ensure roomId is exactly what's in the DB
             .select();
@@ -108,10 +112,28 @@ export async function sendRoomMessage(roomId, userId, content) {
     if (error) {
         // This logs on your Fedora terminal (server-side)
         console.error("Supabase Error:", error.message);
-        
+
         // This sends the error back to the browser
-        return { success: false, error: error.message }; 
+        return { success: false, error: error.message };
     }
 
     return { success: true, data };
+}
+
+export async function extractPdfText(formData) {
+    const inputFile = formData.get("inputFile");
+    if (!inputFile) return "No file selected";
+
+    try {
+        const arrayBuffer = await inputFile.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        
+        // This fork handles the "Server" environment much better
+        const data = await pdf(buffer);
+        
+        return data.text;
+    } catch (error) {
+        console.error("Extraction error:", error);
+        return "Failed to read PDF. Try a different file.";
+    }
 }

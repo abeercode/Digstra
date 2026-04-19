@@ -3,12 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import RoomTimer from "@/components/RoomTimer";
 import ShareRoom from "@/components/ShareRoom";
 import { auth } from "@/auth";
-
 import RoomChat from "@/components/RoomChat";
+import Quiz from "@/components/Quiz";
 
-
-
-// import ActiveUsers from "@/components/ActiveUsers";
 export default async function RoomPage({ params }) {
 
     const { RoomId } = await params;
@@ -78,6 +75,7 @@ const { data: initialMessages } = await supabase
             />
             <ShareRoom />
             <RoomChat roomId={RoomId} currentUserId={currentUserId} initialMessages={initialMessages} currentUserName={session.user.name}/>
+   <Quiz/>
             {/* <ActiveUsers 
     roomId={RoomId} 
     userName={userName} 
