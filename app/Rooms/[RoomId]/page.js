@@ -38,6 +38,18 @@ export default async function RoomPage({ params }) {
         redirect(`/Rooms/${RoomId}/summary`);
     }
 
+    // Inside your Room Page (Server Component)
+const { data: initialMessages } = await supabase
+    .from('room_messages')
+    .select(`
+        *,
+        profiles (
+            username
+        )
+    `) // This "Joins" the profiles table
+    .eq('room_id', RoomId)
+    .order('created_at', { ascending: true });
+
     if (error || !room) {
         return <div className="p-10 bg-red-100">Database Error: {error.message}</div>;
     }
@@ -65,7 +77,7 @@ export default async function RoomPage({ params }) {
                 initialStartedAt={room.started_at}
             />
             <ShareRoom />
-            <RoomChat roomId={RoomId} currentUserId={currentUserId} initialMessages={[]}/>
+            <RoomChat roomId={RoomId} currentUserId={currentUserId} initialMessages={initialMessages} currentUserName={session.user.name}/>
             {/* <ActiveUsers 
     roomId={RoomId} 
     userName={userName} 
