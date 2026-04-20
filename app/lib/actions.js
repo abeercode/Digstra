@@ -3,10 +3,16 @@
 import { auth } from "@/auth";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-    const pdf = require("pdf-parse-fork");
+const pdf = require("pdf-parse-fork");
+
+import { GoogleGenerativeAI } from "@google/generative-ai";
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
+})
+
 // import pdf from "pdf-parse"
-
-
 
 export async function createRoom(formData) {
     const session = await auth();
@@ -127,13 +133,18 @@ export async function extractPdfText(formData) {
     try {
         const arrayBuffer = await inputFile.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
-        
-        // This fork handles the "Server" environment much better
         const data = await pdf(buffer);
-        
         return data.text;
+
     } catch (error) {
         console.error("Extraction error:", error);
         return "Failed to read PDF. Try a different file.";
     }
+}
+
+
+async function generateQuestions(text) {
+
+
+    
 }
