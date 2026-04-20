@@ -5,11 +5,13 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 const pdf = require("pdf-parse-fork");
 
+
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      generationConfig: { responseMimeType: "application/json" }
+    model: "gemini-2.5-flash-lite",
+    generationConfig: { responseMimeType: "application/json" }
 })
 
 // import pdf from "pdf-parse"
@@ -127,24 +129,65 @@ export async function sendRoomMessage(roomId, userId, content) {
 }
 
 export async function extractPdfText(formData) {
+    console.log("1. Action started");
     const inputFile = formData.get("inputFile");
     if (!inputFile) return "No file selected";
 
     try {
         const arrayBuffer = await inputFile.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
+        console.log("2. Buffer created, parsing PDF...");
         const data = await pdf(buffer);
-        return data.text;
+        console.log("3. PDF parsed, text length:", data.text.length);
+        const extractedText = data.text;
+        console.log("4. AI finished generating questions");
+        const quizData = await generateQuestions(extractedText);
+
+        return { success: true, quiz: quizData };
 
     } catch (error) {
-        console.error("Extraction error:", error);
-        return "Failed to read PDF. Try a different file.";
+        console.error("CRASH IN ACTION:", error);
+        return { success: false, message: error.message };
     }
 }
 
 
 async function generateQuestions(text) {
+        const prompt = `
+        You are an expert professor. Create 5 multiple-choice questions from the text provided.
+  
+        DIFFICULTY: Easy to Intermediate.
+        STYLE: Concise, clear, and direct.
 
+        CONSTRAINTS:
+        - Question: Keep it under 15 words.
+        - Options: Each option must be a short phrase (max 6 words). 
+        - Distractors: Must be plausible but short.
+        - Explanation: Exactly one sentence explaining the core reason.
 
+        Return ONLY a JSON array of objects using this schema:
+        {
+            "question": "string",
+            "options": ["string", "string", "string", "string"],
+            "correctIndex": number (0-3),
+            "explanation": "string"
+        }
+  
+        Text to analyze: ${text}
+    `;
+        // ... rest of your code
     
+    try {
+        const result = await model.generateContent(prompt)
+        const response = await result.response
+        const jsonString = response.text()
+
+        return JSON.parse(jsonString);
+    }
+    catch (error) {
+        console.error("Gemini Error:", error);
+        throw new Error("AI failed to generate quiz");
+
+    }
+
 }

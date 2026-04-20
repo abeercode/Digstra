@@ -6,6 +6,10 @@ import { auth } from "@/auth";
 import RoomChat from "@/components/RoomChat";
 import Quiz from "@/components/Quiz";
 
+
+export const maxDuration = 60;
+
+
 export default async function RoomPage({ params }) {
 
     const { RoomId } = await params;
