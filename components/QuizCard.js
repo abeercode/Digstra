@@ -9,10 +9,34 @@ export default function QuizCard({ quiz }) {
     const [allAns, setAllAns] = useState({})
     const [score, setScore] = useState(0);
 
+    const [showResult, setShowResult] = useState(false)
+
+
     // const[isClicked , setIsClicked] = useState(false); not needed
 
-    const handleCheck = () => {
+    const handleNextBtn = () => {
+        setCurrentIndex(currentIndex + 1);
+        setIsChecked(false)
+        setSelectedAns(null)
+    }
 
+    const handleFinishBtn = () => {
+        setShowResult(true)
+
+    }
+
+    if (showResult) {
+        return (
+            <>
+
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold">Quiz Complete!</h2>
+                    <p className="text-4xl my-4">Score: {score} / {quiz.length}</p>
+                    <button onClick={() => window.location.reload()}>Close</button>
+                </div>
+
+            </>
+        )
     }
 
     return (
@@ -52,11 +76,9 @@ export default function QuizCard({ quiz }) {
                 Check Answer
             </button>
             {/* next question */}
-            {isChecked && (<button onClick={() => {
-                setCurrentIndex(currentIndex + 1);
-                setIsChecked(false)
-                setSelectedAns(null)
-            }}  > next</button>)}
+            {isChecked && (currentIndex < quiz.length - 1 ? (<button onClick={handleNextBtn}>
+                next</button>
+            ) : (<button onClick={handleFinishBtn}> finish </button>))}
 
             {/* <button name="1"> {quiz[currentIndex].options[0]}</button>
          <br></br>
@@ -71,7 +93,7 @@ export default function QuizCard({ quiz }) {
              <button disabled={selectedAns == null} 
             onClick={() => { setIsClicked(true) }} 
              name="checked"> check your answer</button> */}
-             
+
         </>
     )
 }
