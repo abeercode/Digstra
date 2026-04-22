@@ -65,7 +65,12 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
 
     // Keep it at the bottom and refreshed every time messages is changed/expanded
     useEffect(() => {
-        scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+        // scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+const container = scrollRef.current?.parentElement;
+if (container) {
+    container.scrollTop = container.scrollHeight;
+}
+
     }, [messages]);
 
     const handleSendMessage = async (e) => {

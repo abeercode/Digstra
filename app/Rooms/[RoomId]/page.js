@@ -5,11 +5,7 @@ import ShareRoom from "@/components/ShareRoom";
 import { auth } from "@/auth";
 import RoomChat from "@/components/RoomChat";
 import Quiz from "@/components/Quiz";
-
-
 export const maxDuration = 60;
-
-
 export default async function RoomPage({ params }) {
 
     const { RoomId } = await params;
@@ -38,23 +34,21 @@ export default async function RoomPage({ params }) {
     if (room?.is_finished) {
         redirect(`/Rooms/${RoomId}/summary`);
     }
-
     // Inside your Room Page (Server Component)
-const { data: initialMessages } = await supabase
-    .from('room_messages')
-    .select(`
+    const { data: initialMessages } = await supabase
+        .from('room_messages')
+        .select(`
         *,
         profiles (
             username
         )
     `) // This "Joins" the profiles table
-    .eq('room_id', RoomId)
-    .order('created_at', { ascending: true });
+        .eq('room_id', RoomId)
+        .order('created_at', { ascending: true });
 
     if (error || !room) {
         return <div className="p-10 bg-red-100">Database Error: {error.message}</div>;
     }
-
     //     const SharingLink = () => {
     // navigator.clipboard.writeText(window.location.href)
     //     }
@@ -78,8 +72,8 @@ const { data: initialMessages } = await supabase
                 initialStartedAt={room.started_at}
             />
             <ShareRoom />
-            <RoomChat roomId={RoomId} currentUserId={currentUserId} initialMessages={initialMessages} currentUserName={session.user.name}/>
-   <Quiz/>
+            <RoomChat roomId={RoomId} currentUserId={currentUserId} initialMessages={initialMessages} currentUserName={session?.user?.name} />
+            <Quiz RoomId={RoomId}/>
             {/* <ActiveUsers 
     roomId={RoomId} 
     userName={userName} 

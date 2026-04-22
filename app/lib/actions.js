@@ -1,21 +1,29 @@
 'use server'
-
 import { auth } from "@/auth";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 const pdf = require("pdf-parse-fork");
 
-
-
+// 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
+    // all free great models: 
+    //   gemini-2.5-flash-lite
+    //   gemini-2.5-pro
+    //   gemini-2.5-flash
+    //   gemini-3.1-flash-lite-preview
+    //   gemini-2.5-flash-lite-preview-09-2025
+    
+    // don't use the below models they will be shut down/ very old: 
+    //   gemini-2.0-flash
+    //   gemini-2.0-flash-lite
+    //   gemini-embedding-001
+  model: "gemini-3.1-flash-lite-preview",
     generationConfig: { responseMimeType: "application/json" }
 })
 
 // import pdf from "pdf-parse"
-
 export async function createRoom(formData) {
     const session = await auth();
     if (!session?.user) {
@@ -55,8 +63,6 @@ export async function createRoom(formData) {
 
     redirect(`/Rooms/${newRoom.id}`);
 }
-
-
 
 //another action that handle when the session is ended and update the needed columns
 export async function updateRoomStatus(roomId) {
@@ -108,7 +114,6 @@ export async function startRoomTimer(roomId) {
     return { success: true };
 }
 
-
 export async function sendRoomMessage(roomId, userId, content) {
     const supabase = await createClient();
 
@@ -116,7 +121,6 @@ export async function sendRoomMessage(roomId, userId, content) {
         .from('room_messages')
         .insert([{ room_id: roomId, user_id: userId, content: content }])
         .select();
-
     if (error) {
         // This logs on your Fedora terminal (server-side)
         console.error("Supabase Error:", error.message);
@@ -124,11 +128,9 @@ export async function sendRoomMessage(roomId, userId, content) {
         // This sends the error back to the browser
         return { success: false, error: error.message };
     }
-
     return { success: true, data };
 }
-
-export async function extractPdfText(formData) {
+export async function extractPdfText(formData , RoomId) {
     console.log("1. Action started");
     const inputFile = formData.get("inputFile");
     if (!inputFile) return "No file selected";
@@ -150,15 +152,13 @@ export async function extractPdfText(formData) {
         return { success: false, message: error.message };
     }
 }
-
-
 async function generateQuestions(text) {
-        const prompt = `
+    const prompt = `
         You are an expert professor. Create 5 multiple-choice questions from the text provided.
   
         DIFFICULTY: Easy to Intermediate.
         STYLE: Concise, clear, and direct.
-
+        
         CONSTRAINTS:
         - Question: Keep it under 15 words.
         - Options: Each option must be a short phrase (max 6 words). 
@@ -175,19 +175,16 @@ async function generateQuestions(text) {
   
         Text to analyze: ${text}
     `;
-        // ... rest of your code
-    
+    // ... rest of your code
     try {
         const result = await model.generateContent(prompt)
         const response = await result.response
         const jsonString = response.text()
 
-        return JSON.parse(jsonString);
+        return JSON.parse(jsonString); // returns an array with json objects
     }
     catch (error) {
         console.error("Gemini Error:", error);
         throw new Error("AI failed to generate quiz");
-
     }
-
 }

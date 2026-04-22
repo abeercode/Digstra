@@ -17,11 +17,11 @@ export default async function SummaryPage({ params }) {
         .single();
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
-            <div className="bg-white p-10 rounded-3xl shadow-xl text-center max-w-md border border-gray-100">
-                <span className="text-6xl">🎉</span>
+        <div className="flex flex-col items-center justify-center min-h-screen p-6">
+            <div className="bg-white p-10 rounded-3xl  text-center max-w-md">
+                <span className="text-6xl">ദ്ദി(˵ •̀ ᴗ - ˵ ) ✧</span>
                 <h1 className="text-3xl font-bold text-gray-800 mt-4">
-                    Great job, Abeer!
+                    Great job Abeer!
                 </h1>
                 <p className="text-gray-500 mt-2">
                     You have successfully finished the session:
@@ -32,10 +32,10 @@ export default async function SummaryPage({ params }) {
                 
                 <hr className="my-8 border-gray-100" />
                 
-                <p className="text-sm text-gray-400 italic">
+                {/* <p className="text-sm text-gray-400 italic">
                     Summary stats and AI quizzes will be loaded here soon.
                 </p>
-                
+                 */}
             </div>
         </div>
     );
