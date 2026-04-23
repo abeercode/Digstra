@@ -1,28 +1,16 @@
 "use client"
 import { extractPdfText } from "@/app/lib/actions"
-import { useState, useEffect, useMemo, use } from "react"
+import { useState, useEffect } from "react"
 import QuizCard from "./QuizCard";
 
 export default function Quiz({ RoomId }) {
-    const [textTest, setTextTest] = useState("");
 
-    // Replace your existing state lines with these:
     const [status, setStatus] = useState("");         // To show "AI is thinking..."
     const [quiz, setQuiz] = useState([]);             // To store the array of 5 questions
-    const [selectedAns, setSelectedAns] = useState({}); // To store { questionIndex: answerIndex }
     const [isLoading, setIsLoading] = useState(false);
 
-    const [currentIndex, setCurrentIndex] = useState(0);
+    //not needed ig (?)
     const [isChecked, setIsChecked] = useState(false);
-    const [score, setScore] = useState(0);
-
-
-    const handleSelect = (qIndex, ansIndex) => {
-        setSelectedAns(prev => ({
-            ...prev,
-            [qIndex]: ansIndex // Standard "Power Move" we discussed
-        }));
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,18 +22,15 @@ export default function Quiz({ RoomId }) {
 
             if (result && result.success) {
                 setQuiz(result.quiz)
-                setStatus("Quiz Generated!");
+                setStatus("");
                 setIsChecked(true);
-
-                // setTextTest(prettyJson);
             } else {
-                //  setTextTest("Server Error: " + (result?.message || "Unknown error occurred"));
                 setStatus("Error: " + (result?.message || "Unknown error"));
             }
         } catch (error) {
             // This catches network errors or crashes during the request
             console.error("Frontend Error:", error);
-            setTextTest("Failed to connect to the server.");
+            setStatus("Connection failed.");
         } finally {
             setIsLoading(false);
         }
@@ -53,28 +38,29 @@ export default function Quiz({ RoomId }) {
 
     return (
         <>
-            <br />
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <form onSubmit={handleSubmit} className="flex items-center gap-4" >
+                    <input type="file" id="inputFile" name="inputFile" accept=".pdf" required
+                        className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                    <button type="submit" id="btnFile" className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:bg-gray-400"  >{isLoading ? "Generating..." : "Generate Quiz"} </button>
 
-            <form onSubmit={handleSubmit}>
-                <input type="file" id="inputFile" name="inputFile" accept=".pdf" required />
-                <button type="submit" id="btnFile" name="btnFile"  >upload  </button>
+                    {/* <textarea className="w-full h-96 font-mono text-sm border p-4 mt-4" id="outputTest" value={textTest} readOnly></textarea> */}
+                </form >
+                {status && <p className="mt-2 text-sm text-blue-600 font-medium">{status}</p>}
 
-                {/* <textarea className="w-full h-96 font-mono text-sm border p-4 mt-4" id="outputTest" value={textTest} readOnly></textarea> */}
+                {quiz.length > 0 && isChecked && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                        <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-8 relative">
+                            {/* Close Button */}
+                            <button onClick={() => setQuiz([])} className="absolute top-4 right-4 text-gray-500">✕</button>
 
-            </form >
-
-
-
-            {quiz.length > 0 && isChecked && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-red bg-opacity-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
-                        {/* Close Button */}
-                        <button onClick={() => setQuiz([])} className="absolute top-4 right-4 text-gray-500">✕</button>
-
-                        <QuizCard quiz={quiz} />
+                            <QuizCard quiz={quiz} onClose={() => setQuiz([])} />
+                        </div>
                     </div>
-                </div>
-            )}
+
+                )}
+            </div>
+
         </>
     )
 }
