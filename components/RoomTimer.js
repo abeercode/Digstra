@@ -3,8 +3,8 @@ import { useState, useEffect, useMemo } from "react";
 import { updateRoomStatus, startRoomTimer } from "@/app/lib/actions";
 import { useRouter } from "next/navigation";
 import { client } from "@/lib/supabase/client";
-
-export default function RoomTimer({ duration, roomId, currentUserId, hostId, initialStartedAt }) {
+import { addPoints } from "@/app/lib/actions";
+export default function RoomTimer({ duration, roomId, currentUserId, hostId, initialStartedAt, user }) {
 
     // const [timeLeft, setTimeLeft] = useState(duration * 60);
     const [startedAt, setStartedAt] = useState(initialStartedAt);
@@ -78,13 +78,14 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
             const now = new Date().toISOString();
             setHasMounted(true);
             setStartedAt(now);
-            
+
             //call startRoomTimer to update the table
             await startRoomTimer(roomId);
         } catch (e) {
             console.error("Failed to start timer:", e);
             setStartedAt(null);
-        }};
+        }
+    };
 
 
     const handleFinishSession = async () => {
@@ -103,6 +104,21 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
         const seconds = Math.max(0, time) % 60;
         return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
+
+    useEffect(() => {
+
+        if (!currentUserId) return; //if the user not logged in then return | to not crush out the database 
+
+        addPoints(currentUserId, 1)
+
+        const interval = setInterval(() => {
+            addPoints(currentUserId, 1)
+            console.log("5 min passed 1 point added")
+
+        }, 60000);
+        return () => clearInterval(interval) // after the first run , tell react to clean the previous interval
+
+    }, [currentUserId])  // run everytime when user change | which means once 
 
     // from what i understand, it render the initial duration from the server, and then the system will render the actual remaining duration 
     if (!hasMounted) {
@@ -137,7 +153,7 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
                 )}
                 {startedAt && (
                     // //animate-pulse
-                    <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">  
+                    <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
                         Session Live
                     </span>
                 )}

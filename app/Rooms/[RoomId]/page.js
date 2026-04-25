@@ -5,6 +5,8 @@ import ShareRoom from "@/components/ShareRoom";
 import { auth } from "@/auth";
 import RoomChat from "@/components/RoomChat";
 import Quiz from "@/components/Quiz";
+
+
 export const maxDuration = 60;
 export default async function RoomPage({ params }) {
 
@@ -53,6 +55,10 @@ export default async function RoomPage({ params }) {
     //     const SharingLink = () => {
     // navigator.clipboard.writeText(window.location.href)
     //     }
+
+
+
+
     return (
         <>
             <div>
@@ -71,6 +77,7 @@ export default async function RoomPage({ params }) {
                 currentUserId={currentUserId}
                 hostId={room.host_id}
                 initialStartedAt={room.started_at}
+                user={user}
             />
             <ShareRoom />
             <RoomChat roomId={RoomId} currentUserId={currentUserId} initialMessages={initialMessages} currentUserName={session?.user?.name} />

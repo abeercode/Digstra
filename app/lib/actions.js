@@ -1,8 +1,10 @@
 'use server'
+
 import { auth } from "@/auth";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 const pdf = require("pdf-parse-fork");
+
 
 // 
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -19,7 +21,7 @@ const model = genAI.getGenerativeModel({
     //   gemini-2.0-flash
     //   gemini-2.0-flash-lite
     //   gemini-embedding-001
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-3.1-flash-lite-preview",
     generationConfig: { responseMimeType: "application/json" }
 })
 
@@ -200,20 +202,39 @@ async function generateQuestions(text) {
     }
 }
 
-export async function saveUserScore(RoomId, quizId, score, total, userName, userId){
+export async function saveUserScore(RoomId, quizId, score, total, userName, userId) {
     const supabase = await createClient()
 
-    const {error}= await supabase
-    .from("quiz_scores")
-    .insert([{
-        room_id: RoomId,
-        quiz_id:quizId,
-        score:score,
-        total:total,
-        user_name: userName,
-        user_id: userId
-    }]);
-  if (error) return { success: false, message: error.message };
+    const { error } = await supabase
+        .from("quiz_scores")
+        .insert([{
+            room_id: RoomId,
+            quiz_id: quizId,
+            score: score,
+            total: total,
+            user_name: userName,
+            user_id: userId
+        }]);
+    if (error) return { success: false, message: error.message };
+    return { success: true };
+
+}
+
+export async function addPoints(userId, pointsToAdd) {
+
+    // the trigger in supabase is automatic , that i used to update profile table based on quiz_scores table
+    // but this one is manual that triggered once called ,(remote procedure call) which allow to execute postgresql funcion from client application
+    const supabase = await createClient(); // <--- MUST HAVE AWAIT
+
+    const { error } = await supabase.rpc('increment_points', {
+        user_id: userId,
+        amount: pointsToAdd
+    });
+
+    if (error) {
+        console.error("Supabase RPC Error:", error.message);
+        return { success: false };
+    }
     return { success: true };
 
 }
