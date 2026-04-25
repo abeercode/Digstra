@@ -14,12 +14,12 @@ const model = genAI.getGenerativeModel({
     //   gemini-2.5-flash
     //   gemini-3.1-flash-lite-preview
     //   gemini-2.5-flash-lite-preview-09-2025
-    
+
     // don't use the below models they will be shut down/ very old: 
     //   gemini-2.0-flash
     //   gemini-2.0-flash-lite
     //   gemini-embedding-001
-  model: "gemini-3.1-flash-lite-preview",
+    model: "gemini-2.5-flash-lite",
     generationConfig: { responseMimeType: "application/json" }
 })
 
@@ -130,10 +130,12 @@ export async function sendRoomMessage(roomId, userId, content) {
     }
     return { success: true, data };
 }
-export async function extractPdfText(formData , RoomId) {
+export async function extractPdfText(formData, RoomId) {
     console.log("1. Action started");
     const inputFile = formData.get("inputFile");
     if (!inputFile) return "No file selected";
+
+
 
     try {
         const arrayBuffer = await inputFile.arrayBuffer();
@@ -145,7 +147,16 @@ export async function extractPdfText(formData , RoomId) {
         console.log("4. AI finished generating questions");
         const quizData = await generateQuestions(extractedText);
 
-        return { success: true, quiz: quizData };
+        const supabase = await createClient();
+
+        const { data: newQuiz, error: dbError } = await supabase
+            .from("quizzes")
+            .insert([{ room_id: RoomId, content: quizData }])
+            .select()
+            .single();
+        if (dbError) throw new Error("Could not save quiz to database");
+        return { success: true, quiz: newQuiz.content, quizId: newQuiz.id };
+
 
     } catch (error) {
         console.error("CRASH IN ACTION:", error);
@@ -187,4 +198,22 @@ async function generateQuestions(text) {
         console.error("Gemini Error:", error);
         throw new Error("AI failed to generate quiz");
     }
+}
+
+export async function saveUserScore(RoomId, quizId, score, total, userName, userId){
+    const supabase = await createClient()
+
+    const {error}= await supabase
+    .from("quiz_scores")
+    .insert([{
+        room_id: RoomId,
+        quiz_id:quizId,
+        score:score,
+        total:total,
+        user_name: userName,
+        user_id: userId
+    }]);
+  if (error) return { success: false, message: error.message };
+    return { success: true };
+
 }

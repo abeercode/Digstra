@@ -12,6 +12,7 @@ export default async function RoomPage({ params }) {
     const supabase = await createClient();
     const session = await auth();
     const currentUserId = session?.user?.id;
+    const user = session?.user;
     // const userName = session?.user?.name;
     // const p = params;
 
@@ -73,7 +74,7 @@ export default async function RoomPage({ params }) {
             />
             <ShareRoom />
             <RoomChat roomId={RoomId} currentUserId={currentUserId} initialMessages={initialMessages} currentUserName={session?.user?.name} />
-            <Quiz RoomId={RoomId}/>
+            <Quiz RoomId={RoomId} user={user}/>
             {/* <ActiveUsers 
     roomId={RoomId} 
     userName={userName} 

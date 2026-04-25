@@ -2,12 +2,22 @@
 import { extractPdfText } from "@/app/lib/actions"
 import { useState, useEffect } from "react"
 import QuizCard from "./QuizCard";
+import { client } from "@/lib/supabase/client";
 
-export default function Quiz({ RoomId }) {
+export default function Quiz({ RoomId, user }) {
 
-    const [status, setStatus] = useState("");         // To show "AI is thinking..."
+    const [status, setStatus] = useState("");         // to show "AI is thinking..."
     const [quiz, setQuiz] = useState([]);             // To store the array of 5 questions
     const [isLoading, setIsLoading] = useState(false);
+
+    //for saving to the database and real-time feature
+    const [quizId, setQuizId] = useState(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const [tookQuiz, setTookQuiz] = useState(false);
+
+    const [prevScore, setPrevScore]= useState(0)
+
 
     //not needed ig (?)
     const [isChecked, setIsChecked] = useState(false);
@@ -22,8 +32,10 @@ export default function Quiz({ RoomId }) {
 
             if (result && result.success) {
                 setQuiz(result.quiz)
+                setQuizId(result.quizId)
                 setStatus("");
                 setIsChecked(true);
+                setIsModalOpen(true)
             } else {
                 setStatus("Error: " + (result?.message || "Unknown error"));
             }
@@ -34,6 +46,67 @@ export default function Quiz({ RoomId }) {
         } finally {
             setIsLoading(false);
         }
+    }
+    useEffect(() => {
+            const supabase = client();
+        async function loadExistingQuiz() {
+        
+            const { data: quizData } = await supabase
+                .from('quizzes')
+                .select('*') // Get everything, including the ID
+                .filter('room_id', 'eq', RoomId)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (quizData) {
+                setQuiz(quizData.content);
+                setQuizId(quizData.id);
+                setIsChecked(true);
+
+                const { data: scoreData } = await supabase       //--> to check if the user has already took the quiz
+                    .from("quiz_scores")
+                    .select("score")
+                    .eq("quiz_id", quizData.id)
+                    .eq("user_id", user.id)
+                    .maybeSingle();
+
+                if (scoreData) { setTookQuiz(true); setPrevScore(scoreData.score)}
+
+            }
+        }
+        loadExistingQuiz();
+
+
+        const channel = supabase
+            .channel(`room-${RoomId}`)
+        .on("postgres_changes", {
+
+            event: "INSERT",
+            schema: "public",
+            table: "quizzes",
+            filter: `room_id=eq.${RoomId}`
+        }, (payload) => {
+            console.log("new quiz")
+            setQuiz(payload.new.content);
+            setQuizId(payload.new.id);
+            setIsChecked(true);
+            setTookQuiz(false);
+            setPrevScore(0)
+        })
+            .subscribe();
+
+        return () => {
+
+            supabase.removeChannel(channel)
+        }
+
+    }, [RoomId, user.id]);
+
+    const handleQuizComplete=(finalScore)=>{ // the child component get to call this function and update score immediatly 
+
+        setTookQuiz(true)
+        setPrevScore(finalScore)
     }
 
     return (
@@ -48,13 +121,36 @@ export default function Quiz({ RoomId }) {
                 </form >
                 {status && <p className="mt-2 text-sm text-blue-600 font-medium">{status}</p>}
 
-                {quiz.length > 0 && isChecked && (
+                {/* NEW: If a quiz exists, let users join it instead of forcing the modal open immediately */}
+
+                {quiz.length > 0 && !isModalOpen && (
+                    <div className="mt-4 p-4 bg-blue-100 border border-blue-300 rounded-lg flex justify-between items-center">
+                        <p className="font-bold text-blue-800">{!tookQuiz ? "An active quiz is available for this room!" : "you've already took the quiz"} </p>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className={`${tookQuiz ? 'bg-gray-800' : 'bg-blue-600'} text-white px-6 py-2 rounded-lg font-bold`}
+                        >
+                            {tookQuiz ? "View Your Score" : "Join Quiz"}
+                        </button>
+                    </div>
+                )}
+                {isModalOpen && quiz.length > 0 && isChecked && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                         <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-8 relative">
                             {/* Close Button */}
-                            <button onClick={() => setQuiz([])} className="absolute top-4 right-4 text-gray-500">✕</button>
+                            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-gray-500">✕</button>
 
-                            <QuizCard quiz={quiz} onClose={() => setQuiz([])} />
+                            <QuizCard
+                                quiz={quiz}
+                                quizId={quizId}
+                                RoomId={RoomId}
+                                user={user}
+                                onClose={() => setIsModalOpen(false)}
+                                tookQuiz={tookQuiz}
+                                prevScore={prevScore}
+                                onComplete={handleQuizComplete} //this concept called "lifting state up"
+
+                            />
                         </div>
                     </div>
 

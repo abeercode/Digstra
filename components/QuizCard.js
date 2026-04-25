@@ -1,43 +1,54 @@
 import { useEffect, useState } from "react";
+import { saveUserScore } from "@/app/lib/actions";
 
-export default function QuizCard({ quiz , onClose
- }) {
-
+export default function QuizCard({ quiz, onClose, RoomId, quizId, user , tookQuiz , prevScore, onComplete}) {
     const [isChecked, setIsChecked] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedAns, setSelectedAns] = useState(null);
-    const [allAns, setAllAns] = useState({})
-    const [score, setScore] = useState(0);
-    const [showResult, setShowResult] = useState(false)
-
+    const [score, setScore] = useState(tookQuiz? prevScore:0);
+    const [showResult, setShowResult] = useState(tookQuiz)
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleNextBtn = () => {
         setCurrentIndex(currentIndex + 1);
         setIsChecked(false)
         setSelectedAns(null)
     }
+    const handleFinishBtn = async () => {
 
-    const handleFinishBtn = () => {
-        setShowResult(true)
+        setIsSaving(true)
+        const result = await saveUserScore(RoomId, quizId, score, quiz.length, user.name, user.id);
+
+        if (result) {
+            setShowResult(true)    
+
+            if(onComplete){
+                onComplete(score)   //call the function in parent "Quiz.js" to update the score 
+            }
+
+        } else {
+            console.error("Failed to save score");
+            // You could show an error message here if you want
+        }
+        setIsSaving(false)
+
     }
-
     if (showResult) {
         return (
-            <>
-                <div className="text-center p-6">
-                    <h2 className="text-3xl font-bold text-blue-600">Quiz Complete!</h2>
-                    <div className="my-8">
-                        <span className="text-6xl font-extrabold">{score}</span>
-                        <span className="text-2xl text-gray-500"> / {quiz.length}</span>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition-all font-bold"
-                    >
-                        Return to Room
-                    </button>
+            <div className="text-center p-6 animate-in zoom-in duration-300">
+                <h2 className="text-3xl font-bold text-blue-600">Quiz Complete!</h2>
+                <div className="my-8">
+                    <span className="text-6xl font-extrabold">{score}</span>
+                    <span className="text-2xl text-gray-500"> / {quiz.length}</span>
                 </div>
-            </>
+                <p className="text-green-600 font-bold mb-4">Your score was saved to the leaderboard!</p>
+                <button
+                    onClick={onClose}
+                    className="bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition-all font-bold"
+                >
+                    Return to Room
+                </button>
+            </div>
         )
     }
     const currentQ = quiz[currentIndex]

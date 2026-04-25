@@ -30,12 +30,13 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
         setUserCache(prev => ({ ...prev, [userId]: displayName }));
     };
 
-    // 2. FILL CACHE: Populate from initial messages immediately
+    // Populate from initial messages immediately
+
     useEffect(() => {
         const initialCache = {};
         initialMessages?.forEach(msg => {
             if (msg.user_id !== currentUserId) {
-                // If the server join worked, it's in msg.profiles
+
                 const name = msg.profiles?.username || msg.profiles?.full_name;
                 if (name) initialCache[msg.user_id] = name;
             }
@@ -44,7 +45,9 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
         setUserCache(prev => ({ ...prev, ...initialCache }));
     }, [initialMessages, currentUserId]);
 
-    // 3. REALTIME: Listen for new messages
+
+
+    //REALTIME: Listen for new messages
     useEffect(() => {
         const channel = supabase
             .channel(`room_chat_${roomId}`)
@@ -66,10 +69,10 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
     // Keep it at the bottom and refreshed every time messages is changed/expanded
     useEffect(() => {
         // scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-const container = scrollRef.current?.parentElement;
-if (container) {
-    container.scrollTop = container.scrollHeight;
-}
+        const container = scrollRef.current?.parentElement;
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
 
     }, [messages]);
 
@@ -77,7 +80,7 @@ if (container) {
         e.preventDefault(); //stop the page from refreshing when user hit enter
         if (!newMessage.trim()) return;
         const content = newMessage;
-        setNewMessage(""); // clear the input area immediately to enhance ui 
+        setNewMessage(""); // clear the input area 
         try {
             await sendRoomMessage(roomId, currentUserId, content);
         } catch (error) {
@@ -93,11 +96,10 @@ if (container) {
                 {messages.map((msg, index) => {
                     const isMe = msg.user_id === currentUserId;
 
-                    // CRITICAL LOGIC: 
                     //If me -> currentUserName
                     //if in cache -> userCache[id]
                     // if in msg object (server side) -> msg.profiles.username
-                    //else -> "Loading..."
+                    //else -> "loading..."
                     const senderName = isMe
                         ? currentUserName
                         : (userCache[msg.user_id] || msg.profiles?.username || msg.profiles?.full_name || "Student...");
