@@ -3,6 +3,7 @@ import "./globals.css";
 import { auth } from "@/auth";
 import SessionProvider from "@/components/SessionProvider";
 import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
 
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default async function RootLayout({ children }) {
             {children}
           </main>
         </SessionProvider>
+        <Footer/>
       </body>
     </html>
   );

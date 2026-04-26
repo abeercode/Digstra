@@ -17,7 +17,7 @@ export default async function Home() {
   else {
     return (
 
-      <main className=" p-0 m-0 bg-[url(/anotherInitialBG.png)] min-h-screen box-border flex flex-col items-center justify-center relative" style={{
+      <main className=" p-0 m-0 bg-[url(/BGWOGround.png)] min-h-screen box-border flex flex-col items-center justify-center relative" style={{
         imageRendering: 'pixelated',
         height: "610px",
         backgroundSize: 'cover',
