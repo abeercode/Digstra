@@ -80,7 +80,6 @@ export default async function Dashboard() {
         <div id="MotherContainer" className="bg-[#dcfdff]">
             <div className="p-8 max-w-4xl mx-auto pt-20 ">
 
-
                 {/* the name and avatar section */}
                 <main>
                     {/* the name and avatar section */}
@@ -95,9 +94,8 @@ export default async function Dashboard() {
                                 className="object-cover pixelated pixel-art w-40 h-auto pt-2"
                             />
                         </div>
-
                         <h1 className="text-3xl font-bold">Welcome, {userData.full_name}</h1>
-                        <p className="text-[#40849f]">You have earned <strong> {userData.points} </strong> points so far ⛁</p>
+                        <p className="text-[#40849f]">You have earned <strong className="text-[#6abe30]"> {userData.points} </strong> points so far ⛁</p>
                     </header>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
