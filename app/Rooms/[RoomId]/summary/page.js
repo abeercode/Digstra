@@ -7,7 +7,7 @@ export default async function SummaryPage({ params }) {
     const session = await auth();
     const userId = session?.user?.id;
 
-    //fetch the room details 
+    //fetch the room details  
     const supabase = await createClient();
     const { data: room } = await supabase
         .from('rooms')

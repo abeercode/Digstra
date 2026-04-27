@@ -5,19 +5,14 @@ import QuizCard from "./QuizCard";
 import { client } from "@/lib/supabase/client";
 
 export default function Quiz({ RoomId, user }) {
-
     const [status, setStatus] = useState("");         // to show "AI is thinking..."
     const [quiz, setQuiz] = useState([]);             // To store the array of 5 questions
     const [isLoading, setIsLoading] = useState(false);
-
     //for saving to the database and real-time feature
     const [quizId, setQuizId] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
-
     const [tookQuiz, setTookQuiz] = useState(false);
-
     const [prevScore, setPrevScore]= useState(0)
-
 
     //not needed ig (?)
     const [isChecked, setIsChecked] = useState(false);
@@ -76,8 +71,6 @@ export default function Quiz({ RoomId, user }) {
             }
         }
         loadExistingQuiz();
-
-
         const channel = supabase
             .channel(`room-${RoomId}`)
         .on("postgres_changes", {
@@ -104,7 +97,6 @@ export default function Quiz({ RoomId, user }) {
     }, [RoomId, user.id]);
 
     const handleQuizComplete=(finalScore)=>{ // the child component get to call this function and update score immediatly 
-
         setTookQuiz(true)
         setPrevScore(finalScore)
     }
@@ -121,7 +113,7 @@ export default function Quiz({ RoomId, user }) {
                 </form >
                 {status && <p className="mt-2 text-sm text-blue-600 font-medium">{status}</p>}
 
-                {/* NEW: If a quiz exists, let users join it instead of forcing the modal open immediately */}
+            
 
                 {quiz.length > 0 && !isModalOpen && (
                     <div className="mt-4 p-4 bg-blue-100 border border-blue-300 rounded-lg flex justify-between items-center">

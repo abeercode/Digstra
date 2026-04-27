@@ -7,7 +7,7 @@ export default function Footer() {
     return (
 
         <>
-            <main className=" p-0 m-0 bg-[url(/GroundOnlyFooter.png)] min-h-[33vh] box-border flex flex-col items-center justify-center relative" style={{
+            <main className=" p-0 m-0 bg-[url('/GroundOnlyFooter.png')] min-h-[33vh] box-border flex flex-col items-center justify-center relative" style={{
                 imageRendering: 'pixelated',
                 height: "50px",
                 backgroundSize: 'cover',
