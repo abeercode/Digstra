@@ -24,10 +24,11 @@ export default function NavBar({ session }) {
                 </div>
 
                 {session ? (<>
-                    <div className="gap-4 flex  text-amber-50" >
-                        <Link href="/Dashboard" >Dashboard </Link>
-                        <Link href="/Rooms"> Session</Link>
-                        <LogoutButton></LogoutButton>
+                   <div className="justify-around gap-16 pr-10 flex text-amber-50">
+                        <Link href="/Dashboard" className=" pt-2 text-[22px]" >Dashboard </Link>
+                        <Link href="/Rooms" className=" pt-2 text-[22px]"> Session</Link>
+                           <Link href="/" className=" pt-2 text-[22px]">About</Link>
+                        <LogoutButton ></LogoutButton>
 
                     </div>
                 </>) : (
