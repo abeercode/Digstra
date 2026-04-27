@@ -5,9 +5,8 @@ import ShareRoom from "@/components/ShareRoom";
 import { auth } from "@/auth";
 import RoomChat from "@/components/RoomChat";
 import Quiz from "@/components/Quiz";
-
-
 export const maxDuration = 60;
+
 export default async function RoomPage({ params }) {
 
     const { RoomId } = await params;
@@ -16,7 +15,6 @@ export default async function RoomPage({ params }) {
     const currentUserId = session?.user?.id;
     const user = session?.user;
     // const userName = session?.user?.name;
-    // const p = params;
 
     const { data: room, error } = await supabase
         .from('rooms')
@@ -48,17 +46,12 @@ export default async function RoomPage({ params }) {
     `) // This "Joins" the profiles table
         .eq('room_id', RoomId)
         .order('created_at', { ascending: true });
-
     if (error || !room) {
         return <div className="p-10 bg-red-100">Database Error: {error.message}</div>;
     }
     //     const SharingLink = () => {
     // navigator.clipboard.writeText(window.location.href)
     //     }
-
-
-
-
     return (
         <>
             <div>
@@ -81,14 +74,13 @@ export default async function RoomPage({ params }) {
             />
             <ShareRoom />
             <RoomChat roomId={RoomId} currentUserId={currentUserId} initialMessages={initialMessages} currentUserName={session?.user?.name} />
-            <Quiz RoomId={RoomId} user={user}/>
+            <Quiz RoomId={RoomId} user={user} />
             {/* <ActiveUsers 
     roomId={RoomId} 
     userName={userName} 
     currentUserId={currentUserId} 
 /> */}
-            {/* {handlingTimer(room)} */}
-            {/* //end of debugging use */}
+
         </>
     )
 }

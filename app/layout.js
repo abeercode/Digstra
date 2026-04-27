@@ -1,10 +1,13 @@
+
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { auth } from "@/auth";
 import SessionProvider from "@/components/SessionProvider";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-
+import NavbarWrapper from "@/components/NavbarWrapper";
+import FooterWrapper from "@/components/FooterWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,6 +26,10 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   const session = await auth();
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+
+
   console.log("CURRENT SESSION:", session); //test
   return (
     <html lang="en">
@@ -30,12 +37,12 @@ export default async function RootLayout({ children }) {
         <SessionProvider session={session}>
 
           {/* here where i should put static elements like navbar */}
-          <NavBar session={session} />
+        <NavbarWrapper session={session}/>
           <main>
             {children}
           </main>
         </SessionProvider>
-        <Footer/>
+        <FooterWrapper />
       </body>
     </html>
   );

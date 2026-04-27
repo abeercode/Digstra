@@ -13,23 +13,35 @@
 }
 
 /* @media (prefers-color-scheme: dark) { */
-  /* :root { */
-    /* --background: #0a0a0a; */
-    /* --foreground: #ededed; */
-  /* } */
+/* :root { */
+/* --background: #0a0a0a; */
+/* --foreground: #ededed; */
 /* } */
+/* } */
+@font-face {
+  /* font-family: 'Jersey_10';
+  src: url('/fonts/Jersey_10/Jersey10.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; */
 
+  font-family: "determination";
+  src: url('/fonts/determination/determination.ttf') format('truetype');
+
+}
 body {
   /* background: var(--background); */
   /* color: var(--foreground); */
   /* font-family: Arial, Helvetica, sans-serif; */
   padding: 0px;
-      /* src: url("./public/fonts/Minecraft/Minecraft.ttf") format('truetype'); */
-        font-family: "Minecraft"; 
-
+  /* src: url("/fonts/Jersey_10/Jersey10-Regular.ttf") format('truetype'); */
+  font-family: "determination" , sans-serif;
+  /* determination.ttf */
+  /* Minecraft */
+  /* minedings.ttf */
 }
+
 .pixel-art {
-  
+
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }

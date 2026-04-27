@@ -11,7 +11,7 @@ export default function LoginButton() {
         onClick={() => signIn("google", { redirectTo: "/Dashboard" })}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        className="w-30 h-12 text-blue-900 font-bold bg-contain text-[24px]" style={{
+        className="w-52 h-20 text-blue-900 font-bold bg-contain text-[20px] pixel-art" style={{
             backgroundImage: `url(${hover ? "yellowBtnHoverWShodw.png" : "yellowBtn.png"})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
@@ -19,5 +19,5 @@ export default function LoginButton() {
         }}
 
 
-    >Login</button>
+    > ⛏ Start Digging</button>
 }
