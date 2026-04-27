@@ -5,8 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 const pdf = require("pdf-parse-fork");
 
-
-// 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
@@ -236,5 +234,29 @@ export async function addPoints(userId, pointsToAdd) {
         return { success: false };
     }
     return { success: true };
+
+}
+
+export async function joinRoom(formData ) {
+
+    console.log("helloo????")
+    if (!formData){
+         console.log("whatfff")
+        return { error: "No data provided" };}
+   
+    const supabase = await createClient();
+    const code = formData.get("code");
+    const { data: room, error } = await supabase
+        .from("rooms")
+        .select("id")
+        .eq("id", code)
+        .single();
+
+
+    if (!room || error) {
+        return { error: "that session doesn't exist check the code again" }
+    }
+    console.log(room.id)
+    redirect(`/Rooms/${room.id}`);
 
 }
