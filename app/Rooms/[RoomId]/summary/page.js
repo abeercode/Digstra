@@ -3,8 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 
 import BlueButton from "@/components/BlueButton";
 import YellowButton from "@/components/YellowButton";
+import Link from "next/link";
 
 import Image from "next/image";
+import { redirect } from "next/dist/server/api-utils";
 export default async function SummaryPage({ params }) {
    
     const { RoomId } = await params;
@@ -15,7 +17,7 @@ export default async function SummaryPage({ params }) {
     const supabase = await createClient();
     const { data: room } = await supabase
         .from('rooms')
-        .select('name, duration_minutes')
+        .select('name, duration_minutes , created_at')
         .eq('id', RoomId)
         .single();
 
@@ -25,6 +27,15 @@ export default async function SummaryPage({ params }) {
         .eq("room_id", RoomId)
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
+
+    const timeStamp = room?.created_at
+    const dateObj = new Date(timeStamp)
+
+    const day = dateObj.getDate();
+const month = dateObj.getMonth() + 1;
+const year = dateObj.getFullYear();
+
+const formattedDate = `${day}-${month}-${year}`;
 
     let pointsFromRoom= (room?.duration_minutes ||0)
 
@@ -46,14 +57,16 @@ export default async function SummaryPage({ params }) {
             </div>
             {/* Background Decor - Floating pixel stars or lanterns */}
             {/* MAIN CONTAINER: The Stone Tablet */}
-            <main className="z-20 w-full max-w-2xl bg-amber-50 border-2 border-[#945e2c] shadow-[12px_12px_0px_0px_rgba(41,37,36,.25)] rounded-3xl p-8 flex flex-col items-center mt-10">
+            
+            <main className="z-20 w-full max-w-2xl h-11/12 bg-amber-50 border-2 border-[#945e2c] shadow-[12px_12px_0px_0px_rgba(41,37,36,.25)] rounded-3xl p-8 flex flex-col items-center mt-10">
                 
                 {/* 1. Header: Mission Accomplished */}
-                <div className="text-center mb-8">
+               
+                <div className="text-center mb-8 ">
                     <h1 className="text-4xl  text-[#7c4c1f] uppercase drop-shadow-sm">
                         session Complete
                     </h1>
-                    <div className=" mt-3"> You found Agate! </div>
+                    <div className=" mt-3 text-[#bd8604]"> You found Agate! </div>
                 </div>
 
                 {/* 2. The Big Reward (Hero Visual) */}
@@ -69,11 +82,11 @@ export default async function SummaryPage({ params }) {
                 <div className="grid grid-cols-2 gap-4 w-full mb-8">
                     <div className="bg-white/50 border-2 border-dashed border-stone-800/40 p-4 rounded-xl flex flex-col items-center">
                         <span className="text-xs font-black text-stone-400 uppercase">Time Dug</span>
-                        <span className="text-2xl font-black text-blue-600">67m</span>
+                        <span className="text-2xl font-black text-[#3d8cab]">{room?.duration_minutes}m</span>
                     </div>
                     <div className="bg-white/50 border-2 border-dashed border-stone-800/40 p-4 rounded-xl flex flex-col items-center">
-                        <span className="text-xs font-black text-stone-400 uppercase">Knowledge Ore</span>
-                        <span className="text-2xl font-black text-green-600">78%</span>
+                        <span className="text-xs font-black text-stone-400 uppercase">Total Points</span>
+                        <span className="text-2xl font-black text-[#3c820a]">{totalPoints}XP</span>
                     </div>
                 </div>
 
@@ -83,7 +96,7 @@ export default async function SummaryPage({ params }) {
                     <ul className="space-y-3 text-sm  text-stone-700">
                         <li className="flex justify-between border-b border-stone-200 pb-2">
                             <span className="text-blue-950">Date</span>
-                            <span>{new Date().toLocaleDateString()}</span>
+                            <span>{formattedDate}</span>
                         </li>
                         <li className="flex justify-between border-b border-stone-200 pb-2">
                             <span className="text-blue-950">Quizzes Points</span>
@@ -98,20 +111,21 @@ export default async function SummaryPage({ params }) {
 
                 {/* 5. Navigation Buttons */}
                 <div className="flex gap-4 w-full justify-center items-center">
-                    {/* <button 
-                    className="flex-1 h-14 bg-blue-600 text-white font-black pixel-art hover:translate-y-1 hover:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(29,78,216,1)] border-2 border-stone-800">
-                        new Session
-                    </button> */}
+                 
                    
                         <div className="flex gap-40 justify-center items-center w-full">
+<Link href="/Rooms">
                             <YellowButton  text={"new Session"} func={null} />
-                  
+                  </Link>
+                  <Link href="/Dashboard">
                         <BlueButton text={"return home"} func={null} />
+                        </Link>
                     
 
                         </div>
                         
                 </div>
+                
             </main>
         </div>
 

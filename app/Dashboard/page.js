@@ -89,8 +89,8 @@ export default async function Dashboard() {
                     <header className=" mb-10 flex items-center gap-4">
                         <div className="relative w-30 h-30 border border-gray-300 rounded-full overflow-hidden bg-stone-100">
                             <Image
-                                // src={userData?.avatar_url}
-                                src="/avatarSquare.png"
+                                src={userData?.avatar_url}
+                                // src="/avatarSquare.png"
                                 width={0}
                                 height={0}
                                 alt="profile-pic"
