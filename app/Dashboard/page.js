@@ -77,11 +77,13 @@ export default async function Dashboard() {
 
     // console.log("here is your data", roomData)
     return (<>
-        <div id="MotherContainer" className="bg-[#dcfdff]">
-            <div className="p-8 max-w-4xl mx-auto pt-20 ">
+        <div id="MotherContainer" className="bg-[#dcfdff] flex ">
+
+
+            <div className="p-8 max-w-4xl mx-auto pt-20 flex-1 ">
 
                 {/* the name and avatar section */}
-               
+
                 <main >
                     {/* the name and avatar section */}
                     <header className=" mb-10 flex items-center gap-4">
@@ -178,6 +180,68 @@ export default async function Dashboard() {
                         </div>
                     </section>
                 </main>
+            </div>
+
+            <div className="flex-1 pt-60 mr-8 ml-2">
+
+
+
+                <section className=" h-[60vh] flex flex-col bg-amber-50  rounded-3xl overflow-hidden">
+
+                    {/* 1. HEADER: The Achievement Banner */}
+                    <div className="p-6  flex justify-between items-end">
+                        <div>
+                            <h2 className="text-2xl font-black text-amber-950 ">
+                                Collection
+                            </h2>
+                            <p className="text-[10px] font-bold text-amber-700 tracking-widest">
+                                Findings: 48/48
+                            </p>
+                        </div>
+
+                        {/* Decorative "Rank" Icon */}
+
+                    </div>
+
+                    {/* 2. THE GRID: Spaced for 32x32 gems */}
+                    <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                        {/* 8 columns on large screens makes exactly 6 rows (48 gems).
+           We use 'gap-4' to give the 32px gems plenty of breathing room.
+        */}
+                        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+
+                            {Array.from({ length: 48 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="
+                        aspect-square relative
+                        bg-white border-2 border-amber-200 
+                        rounded-xl flex items-center justify-center 
+                       
+                        hover:border-[#c7915b] hover:bg-white hover:scale-110 
+                        hover:shadow-[6px_6px_0px_0px_rgba(217,119,6,0.3)]
+                        transition-all cursor-pointer group
+                    "
+                                >
+                                    {/* The Gem (32x32) */}
+                                    <Image
+                                        src={`/gems/gem-${i + 1}.png`}
+                                        alt={`Gem ${i + 1}`}
+                                        className="w-10 h-10 pixel-art drop-shadow-sm group-hover:drop-shadow-md"
+                                        fill
+                                    />
+                                    {/* Subtle "Slot ID" or Rarity Dot */}
+                                    <span className="absolute top-1 left-1.5 text-[8px] font-black text-amber-200 group-hover:text-[#c7915b]">
+                                        {String(i + 1).padStart(2, '0')}
+                                    </span>
+                                </div>
+                            ))}
+
+                        </div>
+                    </div>
+                   
+                </section>
+
             </div>
         </div>
     </>)

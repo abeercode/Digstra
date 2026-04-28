@@ -69,11 +69,11 @@ export default async function RoomPage({ params }) {
                     <div>
                         <h1 className="text-2xl  text-[#f8f2ea] tracking-tighter">
 
-                          {room.name}
+                            {room.name}
                         </h1>
                         <p className="text-xs  text-green-50">
                             Leader:<span className="whitespace-pre text-[#e6fab9]"> {room.profiles?.full_name || "Unknown"}                   </span>
-                             Room ID: <span className="whitespace-pre text-[#e6fab9]"> {RoomId} </span>
+                            Room ID: <span className="whitespace-pre text-[#e6fab9]"> {RoomId} </span>
                         </p>
                     </div>
 
@@ -121,7 +121,7 @@ export default async function RoomPage({ params }) {
                         {/* <div className="flex-1 bg-white border-4 border-stone-800 flex flex-col shadow-[4px_4px_0px_0px_rgba(41,37,36,1)] overflow-hidden"> */}
 
                         <div className="flex-1 overflow-y-auto rounded-2xl">
-                        
+
                             <ChatWrapper>
                                 <RoomChat
                                     roomId={RoomId}
