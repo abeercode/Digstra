@@ -113,8 +113,8 @@ export default function Quiz({ RoomId, user }) {
                     <button type="submit" id="btnFile"
                         onMouseEnter={() => setHover(true)}
                         onMouseLeave={() => setHover(false)}
-                        className="w-32 mr-3 h-16  text-blue-900 font-bold flex-shrink-0 bg-contain text-[15px] pixel-art hover:translate-x-1 hover:translate-y-1" style={{
-                            backgroundImage: `url(${hover ? "/yellewBtnBigHover.png" : "/yellewBtnBig.png"})`,
+                        className="w-32 mr-3 h-16  text-white flex-shrink-0 bg-contain text-[15px] pixel-art hover:translate-x-1 hover:translate-y-1" style={{
+                            backgroundImage: `url(${hover ? "/brownBtnBigHover.png" : "/brownBtnBig.png"})`,
                             backgroundSize: "cover",
                             backgroundPosition: "center",
                             backgroundRepeat: "no-repeat",

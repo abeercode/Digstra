@@ -30,7 +30,7 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
         setUserCache(prev => ({ ...prev, [userId]: displayName }));
     };
 
-    // Populate from initial messages immediately
+    // populate from initial messages immediately
 
     useEffect(() => {
         const initialCache = {};
@@ -45,8 +45,7 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
         setUserCache(prev => ({ ...prev, ...initialCache }));
     }, [initialMessages, currentUserId]);
 
-
-    //REALTIME: Listen for new messages
+    //realTime: Listen for new messages
     useEffect(() => {
         const channel = supabase
             .channel(`room_chat_${roomId}`)
@@ -65,7 +64,7 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
         return () => { supabase.removeChannel(channel); };
     }, [roomId, supabase]);
 
-    // Keep it at the bottom and refreshed every time messages is changed/expanded
+    // keep it at the bottom and refreshed every time messages is changed/expanded
     useEffect(() => {
         // scrollRef.current?.scrollIntoView({ behavior: "smooth" });
         const container = scrollRef.current?.parentElement;
@@ -87,8 +86,8 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
     };
 
     return (
-        <div className="flex flex-col h-[400px] w-full max-w-md border rounded-xl bg-white shadow-lg overflow-hidden">
-            <div className="bg-blue-600 p-3 text-white font-bold">Room Chat</div>
+        <div className="flex flex-col h-[550px] w-full max-w-md  bg-amber-50 overflow-hidden">
+
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.map((msg, index) => {
@@ -107,7 +106,7 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
                             <span className="text-[10px] text-gray-400 mb-1 px-1 font-bold">
                                 {senderName}
                             </span>
-                            <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${isMe ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-gray-200 text-gray-800 rounded-tl-none'
+                            <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${isMe ? 'bg-[#d9a066] text-white rounded-tr-none' : 'bg-[#f9d6b3] text-gray-800 rounded-tl-none'
                                 }`}>
                                 {msg.content}
                             </div>
@@ -117,16 +116,16 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
                 <div ref={scrollRef} />
             </div>
 
-            <form onSubmit={handleSendMessage} className="p-3 border-t flex gap-2">
+            <form onSubmit={handleSendMessage} className="p-3 border-t rounded-2xl border-[#945e2c] flex gap-2">
                 <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type a message..."
-                    className="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none"
+                    className="flex-1 border border-[#945e2c] rounded-full px-4 py-2 text-sm focus:outline-none"
                 />
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-full font-bold">
-                    Send
+                <button type="submit" className="bg-[#d9a066] text-white font-bold px-4 py-2 rounded-full">
+                    ➤
                 </button>
             </form>
         </div>

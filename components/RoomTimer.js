@@ -21,8 +21,7 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
         setHasMounted(true);
     }, []);
 
-
-    // more like listner which listen for the moment the host clicks "Start"
+    // more like listener which listen for the moment the host clicks "Start"
     useEffect(() => {
         const channel = supabase
             .channel(`room_timer_${roomId}`)
@@ -74,7 +73,6 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
 
     const handleStart = async () => {
         try {
-
             // this makes the timer start moving the when it clicked
             const now = new Date().toISOString();
             setHasMounted(true);
@@ -87,7 +85,6 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
             setStartedAt(null);
         }
     };
-
     const handleFinishSession = async () => {
         try {
             const result = await updateRoomStatus(roomId);
@@ -98,7 +95,6 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
             console.error("Critical Error during finish:", e);
         }
     };
-
     const formatTime = (time) => {
         const minutes = Math.floor(Math.max(0, time) / 60);
         const seconds = Math.max(0, time) % 60;
@@ -108,9 +104,7 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
     useEffect(() => {
 
         if (!currentUserId) return; //if the user not logged in then return | to not crush out the database 
-
         addPoints(currentUserId, 1)
-
         const interval = setInterval(() => {
             addPoints(currentUserId, 1)
             console.log("5 min passed 1 point added")
@@ -146,7 +140,7 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
                             Start Session
                         </button>
                     )}
-                  
+
                     {startedAt && (
                         // //animate-pulse
 

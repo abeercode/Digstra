@@ -81,9 +81,10 @@ export default async function Dashboard() {
             <div className="p-8 max-w-4xl mx-auto pt-20 ">
 
                 {/* the name and avatar section */}
-                <main>
+               
+                <main >
                     {/* the name and avatar section */}
-                    <header className="mb-10 flex items-center gap-4">
+                    <header className=" mb-10 flex items-center gap-4">
                         <div className="relative w-30 h-30 border border-gray-300 rounded-full overflow-hidden bg-stone-100">
                             <Image
                                 // src={userData?.avatar_url}
