@@ -115,7 +115,7 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
             addPoints(currentUserId, 1)
             console.log("5 min passed 1 point added")
 
-        }, 60000);
+        }, 300000);
         return () => clearInterval(interval) // after the first run , tell react to clean the previous interval
 
     }, [currentUserId])  // run everytime when user change | which means once 

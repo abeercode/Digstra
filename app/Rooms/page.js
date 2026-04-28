@@ -47,13 +47,13 @@ export default function Rooms() {
 
                                 <p className="text-base font-black uppercase text-stone-400 pb-1 pt-4">Session Name</p>
 
-                                <input type="text" placeholder=".NET Final Study..." className="w-full focus:translate-x-1 focus:translate-y-1 bg-white border-2 border-stone-300 p-3 font-mono focus:border-[#162456] outline-none" />
+                                <input type="text" name="roomName" placeholder=".NET Final Study..." className="w-full focus:translate-x-1 focus:translate-y-1 bg-white border-2 border-stone-300 p-3 font-mono focus:border-[#162456] outline-none" />
                                 <div name="timerSections">
                                     <div className="pt-5 pb-1">
                                         <label className="text-base font-black uppercase text-stone-400">set timer</label>
                                     </div>
                                     <select name="duration" id="duration" defaultValue="25"
-                                        className="w-full bg-white border-2 border-stone-300 p-4 font-mono text-lg font-bold text-[#162456] focus:shadow-none focus:translate-x-1 focus:translate-y-1 focus:border-[#162456] transition-all outline-none cursor-pointer"
+                                        className="w-full bg-white border-2 border-stone-300 p-3.5 font-mono text-lg font-bold text-[#162456] focus:shadow-none focus:translate-x-1 focus:translate-y-1 focus:border-[#162456] transition-all outline-none cursor-pointer"
                                     ><option value="" disabled>
                                             Select time
                                         </option>{options}</select>

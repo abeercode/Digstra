@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import RoomTimer from "@/components/RoomTimer";
 import ShareRoom from "@/components/ShareRoom";
+import ShareCode from "@/components/ShareCode";
 import { auth } from "@/auth";
 import RoomChat from "@/components/RoomChat";
 import Quiz from "@/components/Quiz";
@@ -78,22 +79,28 @@ export default async function RoomPage({ params }) {
 
                     <div className="flex items-center gap-4">
                         <ShareRoom />
+                        <ShareCode RoomID={RoomId} />
                     </div>
+
                 </header>
 
-                {/* 2. MAIN HUB: 3-Column Layout */}
-                <main className="relative z-10 flex-1 flex flex-row p-6 gap-6 h-[calc(100vh-80px)]">
+                {/* main */}
+                <main className="relative z-10 flex-1 flex flex-row p-6 gap-6 h-[calc(100vh-80px)] ">
 
                     {/* LEFT SIDE: The Quiz/Knowledge Mine */}
-                    <section className="w-1/4 flex flex-col gap-4">
-                        <div className="flex-1 bg-white border-4 border-stone-800 p-4 shadow-[4px_4px_0px_0px_rgba(41,37,36,1)] overflow-y-auto">
-                            <h3 className="text-sm font-black uppercase mb-3 text-stone-400">Quick Quiz</h3>
-                            <Quiz RoomId={RoomId} user={user} />
+                    <section className=" w-1/4 h-1/2 flex flex-col gap-4 pt-20">
+                        <div className="resize both overflow-auto min-w-[250px] min-h-[300px] max-w-[33vw] max-h-[70vh] w-[25vw] h-[50vh] bg-amber-50 border-2 border-dashed border-stone-800/30 p-4 shadow-[4px_4px_0px_0px_rgba(41,37,36,0.5)] flex flex-col">
+                            <h3 className="text-sm font-black mb-3 text-amber-900 sticky top-0 bg-amber-50 py-1">
+                                QUIZ
+                            </h3>
+                            <div className="flex-1">
+                                <Quiz RoomId={RoomId} user={user} />
+                            </div>
                         </div>
                     </section>
 
                     {/* CENTER: The Timer & Character Focus */}
-                    <section className="flex-1 flex flex-col items-center justify-center">
+                    <section className=" flex flex-col items-center justify-center flex-1">
                         <div className="relative group">
                             {/* You can add a glowing effect behind the timer */}
                             {/* <div className="absolute -inset-4 bg-yellow-400/20 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity"></div> */}

@@ -19,7 +19,7 @@ const model = genAI.getGenerativeModel({
     //   gemini-2.0-flash
     //   gemini-2.0-flash-lite
     //   gemini-embedding-001
-    model: "gemini-3.1-flash-lite-preview",
+    model: "gemini-2.5-flash-lite",
     generationConfig: { responseMimeType: "application/json" }
 })
 

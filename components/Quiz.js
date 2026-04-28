@@ -12,7 +12,11 @@ export default function Quiz({ RoomId, user }) {
     const [quizId, setQuizId] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [tookQuiz, setTookQuiz] = useState(false);
-    const [prevScore, setPrevScore]= useState(0)
+    const [prevScore, setPrevScore] = useState(0)
+
+    const [hover, setHover] = useState(false);
+
+    const[hoverJoinResult , setHoverJoinResult] = useState(false)
 
     //not needed ig (?)
     const [isChecked, setIsChecked] = useState(false);
@@ -43,9 +47,9 @@ export default function Quiz({ RoomId, user }) {
         }
     }
     useEffect(() => {
-            const supabase = client();
+        const supabase = client();
         async function loadExistingQuiz() {
-        
+
             const { data: quizData } = await supabase
                 .from('quizzes')
                 .select('*') // Get everything, including the ID
@@ -66,71 +70,115 @@ export default function Quiz({ RoomId, user }) {
                     .eq("user_id", user.id)
                     .maybeSingle();
 
-                if (scoreData) { setTookQuiz(true); setPrevScore(scoreData.score)}
-
+                if (scoreData) { setTookQuiz(true); setPrevScore(scoreData.score) }
             }
         }
         loadExistingQuiz();
         const channel = supabase
             .channel(`room-${RoomId}`)
-        .on("postgres_changes", {
+            .on("postgres_changes", {
 
-            event: "INSERT",
-            schema: "public",
-            table: "quizzes",
-            filter: `room_id=eq.${RoomId}`
-        }, (payload) => {
-            console.log("new quiz")
-            setQuiz(payload.new.content);
-            setQuizId(payload.new.id);
-            setIsChecked(true);
-            setTookQuiz(false);
-            setPrevScore(0)
-        })
+                event: "INSERT",
+                schema: "public",
+                table: "quizzes",
+                filter: `room_id=eq.${RoomId}`
+            }, (payload) => {
+                console.log("new quiz")
+                setQuiz(payload.new.content);
+                setQuizId(payload.new.id);
+                setIsChecked(true);
+                setTookQuiz(false);
+                setPrevScore(0)
+            })
             .subscribe();
 
         return () => {
 
             supabase.removeChannel(channel)
         }
-
     }, [RoomId, user.id]);
 
-    const handleQuizComplete=(finalScore)=>{ // the child component get to call this function and update score immediatly 
+    const handleQuizComplete = (finalScore) => { // the child component get to call this function and update score immediatly 
         setTookQuiz(true)
         setPrevScore(finalScore)
     }
-
     return (
         <>
-            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <form onSubmit={handleSubmit} className="flex items-center gap-4" >
+            <div className="p-2 pt-4 pb-4 bg-gray-50 rounded-xl border border-gray-200">
+                <form onSubmit={handleSubmit} className="flex items-center gap-0.5" >
                     <input type="file" id="inputFile" name="inputFile" accept=".pdf" required
-                        className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                    <button type="submit" id="btnFile" className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:bg-gray-400"  >{isLoading ? "Generating..." : "Generate Quiz"} </button>
+                        className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-[#c7915b] hover:file:bg-blue-100 " />
+
+                    <button type="submit" id="btnFile"
+                        onMouseEnter={() => setHover(true)}
+                        onMouseLeave={() => setHover(false)}
+                        className="w-32 h-16 text-blue-900 font-bold bg-contain text-[15px] pixel-art hover:translate-x-1 hover:translate-y-1" style={{
+                            backgroundImage: `url(${hover ? "/yellewBtnBigHover.png" : "/yellewBtnBig.png"})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            backgroundRepeat: "no-repeat",
+                        }} >{isLoading ? "Generating" : "Generate"} </button>
 
                     {/* <textarea className="w-full h-96 font-mono text-sm border p-4 mt-4" id="outputTest" value={textTest} readOnly></textarea> */}
                 </form >
-                {status && <p className="mt-2 text-sm text-blue-600 font-medium">{status}</p>}
+                {status && <p className="mt-2 text-sm text-[#307894] font-medium">{status}</p>}
 
-            
 
+
+{/* quiz section */}
                 {quiz.length > 0 && !isModalOpen && (
-                    <div className="mt-4 p-4 bg-blue-100 border border-blue-300 rounded-lg flex justify-between items-center">
-                        <p className="font-bold text-blue-800">{!tookQuiz ? "An active quiz is available for this room!" : "you've already took the quiz"} </p>
+                    <div className="mt-8 p-4 bg-[#d4faf9] border border-[#256d94] rounded-lg flex justify-between items-center">
+                        <p className="font-bold text-[#256d94]">{!tookQuiz ? "An active quiz is available!" : "you've already took the quiz"} </p>
+                       
+                       {tookQuiz ?(
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className={`${tookQuiz ? 'bg-gray-800' : 'bg-blue-600'} text-white px-6 py-2 rounded-lg font-bold`}
-                        >
-                            {tookQuiz ? "View Your Score" : "Join Quiz"}
+                            onMouseEnter={() => setHoverJoinResult(true)}
+                            onMouseLeave={() => setHoverJoinResult(false)}
+                            className="w-32 h-16 text-white font-bold bg-contain text-[16px] pixel-art hover:translate-x-1 hover:translate-y-1" style={{
+                                backgroundImage: `url(${hoverJoinResult ? "/grayBtnHover.png" : "/grayBtn.png"})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                backgroundRepeat: "no-repeat",
+                            }}
+                       >
+                            View Score
                         </button>
+                       ):(
+
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            onMouseEnter={() => setHoverJoinResult(true)}
+                            onMouseLeave={() => setHoverJoinResult(false)}
+                            className="w-32 h-16 text-white font-bold bg-contain text-[16px] pixel-art hover:translate-x-1 hover:translate-y-1" style={{
+                                backgroundImage: `url(${hoverJoinResult ? "/blueBtnHover.png" : "/blueBtn.png"})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                backgroundRepeat: "no-repeat",
+                            }}
+                       
+                       
+                       >
+                           Join
+                        </button>
+                       )}
+                       
+                       
+                        {/* <button
+                            onClick={() => setIsModalOpen(true)}
+                            className={`${tookQuiz ? 'bg-gray-800' : 'bg-blue-600'}`}
+                       
+                       
+                       >
+                            {tookQuiz ? "View Your Score" : "Join Quiz"}
+                        </button> */}
                     </div>
                 )}
                 {isModalOpen && quiz.length > 0 && isChecked && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                        <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-8 relative">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                        <div className="bg-amber-50 rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-8 relative">
                             {/* Close Button */}
-                            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-gray-500">✕</button>
+                            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-gray-500">𝐗</button>
 
                             <QuizCard
                                 quiz={quiz}
@@ -145,10 +193,8 @@ export default function Quiz({ RoomId, user }) {
                             />
                         </div>
                     </div>
-
                 )}
             </div>
-
         </>
     )
 }
