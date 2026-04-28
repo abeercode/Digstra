@@ -11,6 +11,7 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
     const [timeLeft, setTimeLeft] = useState(duration * 60);
     const router = useRouter();
     const supabase = useMemo(() => client(), []);
+    const [hover, setHover] = useState(false);
 
     // to check if the user is the host 
     const isHost = hostId === currentUserId;
@@ -35,13 +36,12 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
                 }
             )
             .subscribe();
-
         return () => { supabase.removeChannel(channel); };
     }, [roomId, supabase]);
 
     // the ticker, recalculates remaining time every second
 
-    //The Math: Remaining Time = Total Duration - (Now - StartTime)
+    //the math: remaining time = total duration - (now - startTime)
     useEffect(() => {
         if (!startedAt) return;
 
@@ -59,8 +59,9 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
                 console.log("Timer finished! Redirecting...");
                 router.push(`/Rooms/${roomId}/summary`);
 
-                // Only the host needs to tell the database to mark it as finished
+                // only the host needs to tell the database to mark it as finished
                 if (isHost) {
+                    // eslint-disable-next-line react-hooks/immutability
                     handleFinishSession();
                 }
             } else {
@@ -74,7 +75,7 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
     const handleStart = async () => {
         try {
 
-            // This makes the timer start moving the millisecond it clicked
+            // this makes the timer start moving the when it clicked
             const now = new Date().toISOString();
             setHasMounted(true);
             setStartedAt(now);
@@ -86,7 +87,6 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
             setStartedAt(null);
         }
     };
-
 
     const handleFinishSession = async () => {
         try {
@@ -124,39 +124,37 @@ export default function RoomTimer({ duration, roomId, currentUserId, hostId, ini
     if (!hasMounted) {
         return <h1 className="text-7xl font-bold text-blue-600">{formatTime(duration * 60)}</h1>;
     }
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    // useEffect(() => {
-    //     // Change this to <= 0 to be safe
-    //     if (timeLeft <= 0) {
-    //         console.log("TIMER REACHED ZERO - Triggering update...");
-    //         // eslint-disable-next-line react-hooks/set-state-in-effect
-    //         setIsActive(false);
-    //         handleFinishSession();
-    //     }
-    // }, [timeLeft, isActive]);
-
     return (
         <>
-            <h1 className="text-7xl  font-bold text-blue-600">
-                {formatTime(timeLeft)}
-            </h1>
-            {/* Control Buttons */}
-            <div className="flex gap-4">
-                {isHost && !startedAt && (
-                    <button
-                        onClick={handleStart}
-                        className="px-8 py-3 bg-green-500 hover:bg-green-600 rounded-full font-bold text-white transition-all shadow-lg"
-                    >
-                        Start Session
-                    </button>
-                )}
-                {startedAt && (
-                    // //animate-pulse
-                    <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
-                        Session Live
-                    </span>
-                )}
+            <div className="flex flex-col justify-center items-center text-center" >
+                <h1 className=" text-9xl font-black text-yellow-400 drop-shadow-[2px_2px_0_rgba(0,0,0,1)] [-webkit-text-shadow:-2px_-2px_0_#000,2px_-2px_0_#000,-2px_2px_0_#000,2px_2px_0_#000]">
+                    {formatTime(timeLeft)}
+                </h1>
+                {/* Control Buttons */}
+                <div className="flex gap-4 pt-7 pb-52">
+                    {isHost && !startedAt && (
+                        <button
+                            onClick={handleStart}
+                            onMouseEnter={() => setHover(true)}
+                            onMouseLeave={() => setHover(false)}
+                            className="w-52 h-23 text-white font-bold bg-contain text-[20px] pixel-art hover:translate-x-1 hover:translate-y-1" style={{
+                                backgroundImage: `url(${hover ? "/greenBtnHover.png" : "/greenBtn.png"})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                backgroundRepeat: "no-repeat",
+                            }} >
+                            Start Session
+                        </button>
+                    )}
+                  
+                    {startedAt && (
+                        // //animate-pulse
+
+                        <span className=" mt-12 px-4 py-2 bg-blue-100 animate-pulse text-[#d74d36] rounded-full text-sm font-bold">
+                            Session Live
+                        </span>
+                    )}
+                </div>
             </div>
         </>)
 }

@@ -90,7 +90,7 @@ export default async function RoomPage({ params }) {
                     {/* LEFT SIDE: The Quiz/Knowledge Mine */}
                     <section className=" w-1/4 h-1/2 flex flex-col gap-4 pt-20">
                         <div className="resize both overflow-auto min-w-[250px] min-h-[300px] max-w-[33vw] max-h-[70vh] w-[25vw] h-[50vh] bg-amber-50 border-2 border-dashed border-stone-800/30 p-4 shadow-[4px_4px_0px_0px_rgba(41,37,36,0.5)] flex flex-col">
-                            <h3 className="text-sm font-black mb-3 text-amber-900 sticky top-0 bg-amber-50 py-1">
+                            <h3 className="text-[20px] font-black mb-3 text-amber-900 sticky top-0 bg-amber-50 py-1">
                                 QUIZ
                             </h3>
                             <div className="flex-1">
@@ -100,7 +100,7 @@ export default async function RoomPage({ params }) {
                     </section>
 
                     {/* CENTER: The Timer & Character Focus */}
-                    <section className=" flex flex-col items-center justify-center flex-1">
+                    <section className=" flex flex-col items-center text-center justify-center flex-1">
                         <div className="relative group">
                             {/* You can add a glowing effect behind the timer */}
                             {/* <div className="absolute -inset-4 bg-yellow-400/20 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity"></div> */}
