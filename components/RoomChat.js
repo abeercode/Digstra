@@ -46,7 +46,6 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
     }, [initialMessages, currentUserId]);
 
 
-
     //REALTIME: Listen for new messages
     useEffect(() => {
         const channel = supabase
@@ -73,7 +72,6 @@ export default function RoomChat({ roomId, currentUserId, initialMessages, curre
         if (container) {
             container.scrollTop = container.scrollHeight;
         }
-
     }, [messages]);
 
     const handleSendMessage = async (e) => {

@@ -16,7 +16,6 @@ export default async function Home() {
   else {
     return (
       <>
-
         <div className=" relative min-h-screen overflow-hidden bg-sky-200 flex">
 
 
@@ -24,11 +23,8 @@ export default async function Home() {
           {/* <div className="absolute inset-0 bg-black/10 z-10" /> */}
           <main className="z-20 relative max-w-7xl mx-auto h-screen flex flex-1 justify-center justify-items-center text-center ">
             <div className="flex flex-row justify-content-center w-full p-20 gap-15 relative">
-
               <div id="right" className="flex-1 flex flex-col text-left  justify-center items-center">
-
                 <div id="texts" className="flex flex-col max-w-xl w-full text-left">
-
                   <div className="text-4xl pb-10 text-left">Unearth Your Potential !</div>
                   <p className="text-2xl text-left pb-3">
                     Start digging, Join a study room and turn your focus into treasure</p>
@@ -39,7 +35,7 @@ export default async function Home() {
               </div>
 
               <div className="flex-1"> </div>
-              <div id="left" className=" right-[0%] bottom-[32%] z-20 flex item-end gap-3 absolute">
+              <div id="left" className=" right-[10%] bottom-[32%] z-20 flex item-end gap-3 absolute">
 
                 <Image src="/cuteInitial.png" height={0} width={0} alt="" className="pt-3 w-44 h-auto pixel-art object-contain"></Image>
                 <Image src="/chestClean.png" height={0} width={0} alt="" className="w-30 h-auto object-contain pixel-art pt-40"></Image>
